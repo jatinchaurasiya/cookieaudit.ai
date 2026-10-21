@@ -12,10 +12,10 @@ export default function HomePage() {
 
       <main className="flex-1 w-full">
         {/* Top Apple Ribbon */}
-        <div className="w-full bg-[#161617]/70 border-b border-white/[0.06] py-2 px-4 text-center text-xs text-[#86868b]">
-          <span className="text-[#f5f5f7] font-medium mr-1.5">New:</span>
+        <div className="w-full bg-white/70 border-b border-black/[0.06] py-2.5 px-4 text-center text-xs text-[#86868b]">
+          <span className="text-[#1d1d1f] font-semibold mr-1.5">New:</span>
           <span>India DPDP Rules 2025 Notice Mandate &amp; Automated Remediation Engine.</span>
-          <a href="#scanner" className="text-[#2997ff] hover:underline ml-2 inline-flex items-center gap-0.5">
+          <a href="#scanner" className="text-[#0066cc] hover:underline ml-2 inline-flex items-center gap-0.5 font-medium">
             Audit now <ChevronRight className="w-3 h-3" />
           </a>
         </div>
@@ -29,14 +29,14 @@ export default function HomePage() {
         <FeaturesGrid />
 
         {/* Apple Showcase Bottom CTA Section */}
-        <section className="py-20 md:py-28 border-t border-white/[0.08] relative overflow-hidden">
+        <section className="py-20 md:py-28 border-t border-black/[0.06] bg-white relative overflow-hidden">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.1] text-xs font-medium text-[#2997ff]">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f5f5f7] border border-black/[0.08] text-xs font-semibold text-[#0066cc]">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Enterprise Compliance Infrastructure</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#f5f5f7] tracking-[-0.03em] leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1d1d1f] tracking-[-0.03em] leading-tight">
               Ready to verify statutory privacy &amp; <br className="hidden sm:inline" />
               cookie security?
             </h2>
@@ -48,7 +48,7 @@ export default function HomePage() {
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 href="#scanner"
-                className="apple-btn-primary text-sm shadow-xl shadow-[#0071e3]/25 flex items-center gap-2"
+                className="apple-btn-primary text-sm shadow-md shadow-[#0071e3]/20 flex items-center gap-2"
               >
                 <span>Audit Your Website</span>
                 <ArrowRight className="w-4 h-4" />
@@ -56,7 +56,7 @@ export default function HomePage() {
 
               <Link
                 href="/drift"
-                className="apple-link text-sm flex items-center gap-1 py-2 px-3"
+                className="apple-link text-sm flex items-center gap-1 py-2 px-3 font-medium"
               >
                 <span>Explore Weekly Drift Monitor</span>
                 <ChevronRight className="w-3.5 h-3.5 chevron" />

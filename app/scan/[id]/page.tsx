@@ -31,9 +31,9 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
       <div className="min-h-screen flex flex-col justify-between apple-canvas">
         <Navbar />
         <main className="max-w-2xl mx-auto px-4 py-24 text-center">
-          <div className="p-8 sm:p-10 rounded-3xl bg-[#161617]/90 border border-white/[0.1] shadow-2xl space-y-4 backdrop-blur-xl">
-            <ShieldAlert className="w-12 h-12 text-[#ff453a] mx-auto" />
-            <h1 className="text-2xl font-semibold text-[#f5f5f7]">Audit Record Not Found</h1>
+          <div className="p-8 sm:p-10 rounded-3xl bg-white border border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.06)] space-y-4">
+            <ShieldAlert className="w-12 h-12 text-[#ff3b30] mx-auto" />
+            <h1 className="text-2xl font-semibold text-[#1d1d1f] tracking-tight">Audit Record Not Found</h1>
             <p className="text-sm text-[#86868b]">
               The requested scan ID or certificate hash does not exist in local cache or has expired.
             </p>
@@ -61,7 +61,7 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
         <div className="flex items-center justify-between text-xs text-[#86868b]">
           <Link
             href="/"
-            className="hover:text-[#2997ff] transition-colors flex items-center gap-1.5"
+            className="hover:text-[#0066cc] transition-colors flex items-center gap-1.5 font-medium"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Scanner
           </Link>

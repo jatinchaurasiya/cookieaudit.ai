@@ -30,15 +30,15 @@ export function RemediationDrawer({ remediation }: RemediationDrawerProps) {
   };
 
   return (
-    <div className="rounded-3xl bg-[#161617]/90 border border-white/[0.1] shadow-2xl p-6 sm:p-7 space-y-6 backdrop-blur-xl">
+    <div className="rounded-3xl bg-white border border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-6 sm:p-7 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.06] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/[0.06] pb-5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#0071e3]/10 border border-[#0071e3]/20 flex items-center justify-center text-[#2997ff] shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[#0071e3]/10 border border-[#0071e3]/20 flex items-center justify-center text-[#0071e3] shrink-0">
             <FileCode className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-[#f5f5f7] tracking-tight">
+            <h3 className="text-base font-semibold text-[#1d1d1f] tracking-tight">
               Automated Remediation &amp; Implementation Code
             </h3>
             <p className="text-xs text-[#86868b]">
@@ -50,7 +50,7 @@ export function RemediationDrawer({ remediation }: RemediationDrawerProps) {
         <button
           type="button"
           onClick={handleCopy}
-          className="apple-btn-primary text-xs flex items-center gap-2 shadow-lg shadow-[#0071e3]/20 shrink-0 self-start sm:self-auto"
+          className="apple-btn-primary text-xs flex items-center gap-2 shrink-0 self-start sm:self-auto"
         >
           {copied ? (
             <>
@@ -67,14 +67,14 @@ export function RemediationDrawer({ remediation }: RemediationDrawerProps) {
       </div>
 
       {/* Apple-style Segmented Pill Control */}
-      <div className="p-1 rounded-full bg-[#1d1d1f] border border-white/[0.08] inline-flex flex-wrap items-center gap-1">
+      <div className="p-1 rounded-full bg-[#f5f5f7] border border-black/[0.08] inline-flex flex-wrap items-center gap-1">
         <button
           type="button"
           onClick={() => setActiveTab("LEGAL")}
           className={`px-3.5 py-1.5 rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 ${
             activeTab === "LEGAL"
               ? "bg-[#0071e3] text-white font-medium shadow-sm"
-              : "text-[#86868b] hover:text-[#f5f5f7]"
+              : "text-[#6e6e73] hover:text-[#1d1d1f]"
           }`}
         >
           <Shield className="w-3.5 h-3.5" />
@@ -87,7 +87,7 @@ export function RemediationDrawer({ remediation }: RemediationDrawerProps) {
           className={`px-3.5 py-1.5 rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 ${
             activeTab === "MIDDLEWARE"
               ? "bg-[#0071e3] text-white font-medium shadow-sm"
-              : "text-[#86868b] hover:text-[#f5f5f7]"
+              : "text-[#6e6e73] hover:text-[#1d1d1f]"
           }`}
         >
           <Terminal className="w-3.5 h-3.5" />
@@ -100,7 +100,7 @@ export function RemediationDrawer({ remediation }: RemediationDrawerProps) {
           className={`px-3.5 py-1.5 rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 ${
             activeTab === "CONSENT_GATE"
               ? "bg-[#0071e3] text-white font-medium shadow-sm"
-              : "text-[#86868b] hover:text-[#f5f5f7]"
+              : "text-[#6e6e73] hover:text-[#1d1d1f]"
           }`}
         >
           <Code2 className="w-3.5 h-3.5" />
@@ -108,9 +108,9 @@ export function RemediationDrawer({ remediation }: RemediationDrawerProps) {
         </button>
       </div>
 
-      {/* Clean Code Viewer Panel (Gate 47: No fake traffic-light dots) */}
-      <div className="rounded-2xl bg-[#000000] border border-white/[0.1] overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-2.5 bg-[#161617] border-b border-white/[0.08] text-xs text-[#86868b]">
+      {/* Clean Code Viewer Panel (macOS Xcode dark container for syntax clarity) */}
+      <div className="rounded-2xl bg-[#1d1d1f] border border-black/[0.1] overflow-hidden shadow-sm">
+        <div className="flex items-center justify-between px-4 py-2.5 bg-[#2c2c2e] border-b border-white/[0.08] text-xs text-[#86868b]">
           <span className="text-[#f5f5f7] font-medium text-xs font-mono">
             {activeTab === "LEGAL"
               ? "dpdp-notice-addendum.md"
@@ -121,7 +121,7 @@ export function RemediationDrawer({ remediation }: RemediationDrawerProps) {
           <span className="text-[11px] text-[#86868b] font-mono">READY_FOR_PASTE</span>
         </div>
 
-        <pre className="p-4 sm:p-5 text-xs text-[#d2d2d7] font-mono overflow-x-auto leading-relaxed max-h-[380px] selection:bg-[#0071e3]/30">
+        <pre className="p-4 sm:p-5 text-xs text-[#e5e5ea] font-mono overflow-x-auto leading-relaxed max-h-[380px] selection:bg-[#0071e3]/40">
           <code>{getActiveContent()}</code>
         </pre>
       </div>
