@@ -1,0 +1,100 @@
+{
+  "cookies": [
+    {
+      "pattern": "^_ga(_.*)?$",
+      "category": "Analytics",
+      "platform": "Google Analytics",
+      "description": "Used to distinguish unique users and calculate visitor, session and campaign data."
+    },
+    {
+      "pattern": "^_gid$",
+      "category": "Analytics",
+      "platform": "Google Analytics",
+      "description": "Stores and updates a unique value for each page visited to generate statistical data."
+    },
+    {
+      "pattern": "^_gat(_.*)?$",
+      "category": "Analytics",
+      "platform": "Google Analytics",
+      "description": "Used by Google Analytics to throttle request rate."
+    },
+    {
+      "pattern": "^_fbp$",
+      "category": "Marketing",
+      "platform": "Meta Pixel",
+      "description": "Used by Meta/Facebook to deliver advertisement products such as real-time bidding."
+    },
+    {
+      "pattern": "^(fr|sb|datr|wd|c_user)$",
+      "category": "Marketing",
+      "platform": "Meta/Facebook",
+      "description": "Contains encrypted Facebook ID and browser identifier for cross-site behavioral retargeting."
+    },
+    {
+      "pattern": "^IDE$",
+      "category": "Marketing",
+      "platform": "Google DoubleClick",
+      "description": "Used by Google DoubleClick to register and report user actions after viewing or clicking ads."
+    },
+    {
+      "pattern": "^test_cookie$",
+      "category": "Marketing",
+      "platform": "Google DoubleClick",
+      "description": "Used to check if the user's browser supports cookies."
+    },
+    {
+      "pattern": "^_cl(ck|sk)$",
+      "category": "Analytics",
+      "platform": "Microsoft Clarity",
+      "description": "Stores and combines pageviews by a user into a single session recording."
+    },
+    {
+      "pattern": "^_hj(id|IncludedInPageviewSample|SessionUser_.*)$",
+      "category": "Analytics",
+      "platform": "Hotjar",
+      "description": "Hotjar cookie that is set when the customer first lands on a page with the Hotjar script."
+    },
+    {
+      "pattern": "^(PHPSESSID|JSESSIONID|connect\\.sid|__Host-.*|next-auth\\.session-token|session_id|sid|session)$",
+      "category": "Strictly Necessary",
+      "platform": "Web Application Framework",
+      "description": "Essential server session identifier required to maintain authenticated state."
+    },
+    {
+      "pattern": "^(csrftoken|XSRF-TOKEN|_csrf)$",
+      "category": "Strictly Necessary",
+      "platform": "Security Framework",
+      "description": "Prevents Cross-Site Request Forgery (CSRF) attacks."
+    },
+    {
+      "pattern": "^(__cf_bm|cf_clearance|__cfruid)$",
+      "category": "Strictly Necessary",
+      "platform": "Cloudflare Bot Management",
+      "description": "Cloudflare security cookies to manage incoming malicious bot traffic."
+    },
+    {
+      "pattern": "^(cookie_consent|CookieConsent|optin|gdpr_consent|cookie-compliance)$",
+      "category": "Strictly Necessary",
+      "platform": "Consent Management Platform (CMP)",
+      "description": "Stores user consent preferences across browsing sessions."
+    },
+    {
+      "pattern": "^(locale|lang|language|theme|dark_mode|currency)$",
+      "category": "Functional",
+      "platform": "User Preferences",
+      "description": "Remembers user display, language, or currency preferences."
+    },
+    {
+      "pattern": "^(MUID|MC0|MR)$",
+      "category": "Marketing",
+      "platform": "Microsoft Advertising",
+      "description": "Used widely by Microsoft as a unique user ID to track visitors across domains."
+    },
+    {
+      "pattern": "^(hubspotutk|__hstc|__hssc)$",
+      "category": "Marketing",
+      "platform": "HubSpot",
+      "description": "Keeps track of visitor identity and behavioral interactions for CRM retargeting."
+    }
+  ]
+}

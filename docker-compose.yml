@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  # 1. Open-Source Crawl4AI Microservice (Replaces fragile raw Playwright)
+  crawl4ai:
+    image: unclecode/crawl4ai:latest
+    container_name: cookieaudit-crawl4ai
+    ports:
+      - "11235:11235"
+    environment:
+      - MAX_CONCURRENT_TASKS=4
+      - CRAWL4AI_API_TOKEN=${CRAWL4AI_API_TOKEN:-}
+    shm_size: "1gb"
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
+    restart: unless-stopped
+
+  # 2. Redis for IP Rate Limiting & Weekly Drift Scan Queue
+  redis:
+    image: redis:7-alpine
+    container_name: cookieaudit-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
