@@ -1,92 +1,218 @@
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 · macrostructure: 05-workbench · genre: atmospheric · theme: bloom/gloom */
+/* Apple Design System & Token Architecture for CookieAudit AI */
 @import "tailwindcss";
 
 @layer base {
   :root {
-    --color-canvas: #070a10;
-    --color-paper: #0b0f17;
-    --color-surface: rgba(15, 23, 42, 0.72);
-    --color-surface-hover: rgba(26, 38, 62, 0.85);
-    --color-text: #f1f5f9;
-    --color-text-muted: #94a3b8;
-    --color-text-subtle: #64748b;
-    --rule-hairline: rgba(255, 255, 255, 0.07);
-    --rule-accent: rgba(56, 189, 248, 0.35);
-    --color-accent: #38bdf8;
-    --color-accent-subtle: rgba(56, 189, 248, 0.1);
-    --color-emerald: #10b981;
-    --color-rose: #f43f5e;
-    --color-amber: #f59e0b;
-    --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
-    --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    /* Apple Primitive Tokens */
+    --color-surface-base: #000000;
+    --color-surface-muted: #0071e3;
+    --color-surface-raised: #d2d2d7;
+    --color-text-secondary: #1d1d1f;
+    --color-text-tertiary: #0066cc;
+    --color-text-inverse: #f5f5f7;
+
+    /* Apple Spacing Scale */
+    --space-1: 3px;
+    --space-2: 4px;
+    --space-3: 5px;
+    --space-4: 6px;
+    --space-5: 8px;
+    --space-6: 9px;
+    --space-7: 9.6px;
+    --space-8: 11px;
+
+    /* Apple Radius Tokens */
+    --radius-xs: 50px;
+    --radius-sm: 980px;
+    --radius-card: 18px;
+
+    /* Apple Motion Tokens */
+    --motion-duration-instant: 100ms;
+    --motion-duration-fast: 250ms;
+    --motion-duration-normal: 320ms;
+    --motion-duration-slow: 1000ms;
+    --motion-ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+    /* Apple Semantic Theme Tokens */
+    --theme-surface-canvas: #000000;
+    --theme-surface-card: #161617;
+    --theme-surface-glass: rgba(22, 22, 23, 0.75);
+    --theme-surface-hover: rgba(32, 32, 35, 0.85);
+    --theme-surface-raised: #1d1d1f;
+    --theme-border-hairline: rgba(210, 210, 215, 0.14);
+    --theme-border-hover: rgba(210, 210, 215, 0.28);
+    
+    --theme-text-primary: #f5f5f7;
+    --theme-text-secondary: #86868b;
+    --theme-text-tertiary: #6e6e73;
+    --theme-text-link: #2997ff;
+    
+    --theme-action-primary: #0071e3;
+    --theme-action-primary-hover: #0077ed;
+    --theme-action-primary-active: #006edb;
+    --theme-focus-ring: #0071e3;
+    
+    --theme-status-success: #34c759;
+    --theme-status-warning: #ff9f0a;
+    --theme-status-error: #ff453a;
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
 
-  /* Slop-test Gate 34: Root overflow-x: clip on BOTH html and body */
   html,
   body {
     overflow-x: clip;
-    background-color: var(--color-canvas);
-    color: var(--color-text);
+    background-color: var(--theme-surface-canvas);
+    color: var(--theme-text-primary);
     font-family: var(--font-sans);
-    font-feature-settings: "rlig" 1, "calt" 1, "cv02" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
   }
 }
 
-/* Atmospheric Gloom/Bloom Canvas (Slop-test Gate 29: <= 20-30% footprint, fixed, non-animating) */
-.gloom-canvas {
-  background-color: var(--color-canvas);
+/* Apple Storefront Canvas Background */
+.apple-canvas {
+  background-color: #000000;
   background-image: 
-    radial-gradient(ellipse 70% 35% at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 65%),
-    radial-gradient(circle 40% at 80% 15%, rgba(99, 102, 241, 0.04) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0, 113, 227, 0.08) 0%, transparent 70%),
+    radial-gradient(circle 50% at 80% 10%, rgba(41, 151, 255, 0.03) 0%, transparent 60%);
   background-attachment: fixed;
 }
 
-/* Precision Workbench Panels */
-.workbench-panel {
-  background-color: var(--color-surface);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--rule-hairline);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+/* Apple Frosted Glass Cards */
+.apple-card {
+  background-color: var(--theme-surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--theme-border-hairline);
+  border-radius: var(--radius-card);
+  transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
-.workbench-panel-subtle {
-  background-color: rgba(11, 15, 23, 0.5);
-  border: 1px solid var(--rule-hairline);
+.apple-card:hover {
+  border-color: var(--theme-border-hover);
 }
 
-/* Slop-test Gate 15: Focus rings appear instantly without fade-in transitions */
+/* Apple Iconic Pill CTA Button */
+.apple-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 400;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 8px 18px;
+  min-height: 36px;
+  border-radius: var(--radius-sm);
+  background-color: var(--theme-action-primary);
+  color: #ffffff;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-standard),
+              transform var(--motion-duration-instant) var(--motion-ease-standard);
+}
+
+.apple-btn-primary:hover {
+  background-color: var(--theme-action-primary-hover);
+}
+
+.apple-btn-primary:active {
+  background-color: var(--theme-action-primary-active);
+  transform: scale(0.98);
+}
+
+.apple-btn-primary:focus-visible {
+  outline: 2px solid var(--theme-focus-ring);
+  outline-offset: 3px;
+}
+
+.apple-btn-primary:disabled {
+  background-color: #333336;
+  color: #86868b;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Apple Secondary Pill Button */
+.apple-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 400;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 8px 18px;
+  min-height: 36px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #f5f5f7;
+  border: 1px solid var(--theme-border-hairline);
+  cursor: pointer;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-standard),
+              border-color var(--motion-duration-fast) var(--motion-ease-standard),
+              transform var(--motion-duration-instant) var(--motion-ease-standard);
+}
+
+.apple-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+  border-color: var(--theme-border-hover);
+}
+
+.apple-btn-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Apple Chevron Link */
+.apple-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--theme-text-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.apple-link:hover {
+  text-decoration: underline;
+}
+
+.apple-link .chevron {
+  display: inline-block;
+  transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.apple-link:hover .chevron {
+  transform: translateX(2px);
+}
+
+/* Apple Focus Ring */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--theme-focus-ring);
   outline-offset: 2px;
 }
 
-/* Reduced motion compliance (Gate 27) */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  ::before,
-  ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Sleek tactile dark scrollbar */
+/* Apple Minimal Dark Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-canvas);
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(210, 210, 215, 0.16);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(210, 210, 215, 0.3);
 }

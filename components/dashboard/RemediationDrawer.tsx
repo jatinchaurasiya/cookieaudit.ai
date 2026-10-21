@@ -30,18 +30,18 @@ export function RemediationDrawer({ remediation }: RemediationDrawerProps) {
   };
 
   return (
-    <div className="rounded-2xl bg-slate-900/60 border border-white/[0.08] shadow-xl p-6 sm:p-7 space-y-5 backdrop-blur-md">
+    <div className="rounded-3xl bg-[#161617]/90 border border-white/[0.1] shadow-2xl p-6 sm:p-7 space-y-6 backdrop-blur-xl">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.06] pb-5">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400">
+          <div className="w-10 h-10 rounded-full bg-[#0071e3]/10 border border-[#0071e3]/20 flex items-center justify-center text-[#2997ff] shrink-0">
             <FileCode className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-100 tracking-tight">
+            <h3 className="text-base font-semibold text-[#f5f5f7] tracking-tight">
               Automated Remediation &amp; Implementation Code
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#86868b]">
               Production-ready statutory disclosures, cookie security middleware, and consent-gated script controllers
             </p>
           </div>
@@ -50,78 +50,78 @@ export function RemediationDrawer({ remediation }: RemediationDrawerProps) {
         <button
           type="button"
           onClick={handleCopy}
-          className="px-3.5 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 active:bg-sky-600 text-slate-950 font-bold text-xs font-mono flex items-center gap-2 transition-colors duration-150 shadow-md shadow-sky-500/20 shrink-0 self-start sm:self-auto"
+          className="apple-btn-primary text-xs flex items-center gap-2 shadow-lg shadow-[#0071e3]/20 shrink-0 self-start sm:self-auto"
         >
           {copied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-slate-950" />
+              <Check className="w-3.5 h-3.5 text-white" />
               <span>Copied to Clipboard</span>
             </>
           ) : (
             <>
-              <Copy className="w-3.5 h-3.5 text-slate-950" />
+              <Copy className="w-3.5 h-3.5 text-white" />
               <span>Copy Fix Snippet</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex flex-wrap items-center gap-1.5 font-mono">
+      {/* Apple-style Segmented Pill Control */}
+      <div className="p-1 rounded-full bg-[#1d1d1f] border border-white/[0.08] inline-flex flex-wrap items-center gap-1">
         <button
           type="button"
           onClick={() => setActiveTab("LEGAL")}
-          className={`px-3 py-1.5 rounded-lg text-xs transition-colors duration-150 flex items-center gap-1.5 ${
+          className={`px-3.5 py-1.5 rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 ${
             activeTab === "LEGAL"
-              ? "bg-white/[0.1] text-sky-400 border border-white/[0.15] font-semibold"
-              : "bg-slate-950/60 border border-white/[0.06] text-slate-400 hover:text-slate-200"
+              ? "bg-[#0071e3] text-white font-medium shadow-sm"
+              : "text-[#86868b] hover:text-[#f5f5f7]"
           }`}
         >
           <Shield className="w-3.5 h-3.5" />
-          <span>DPDP Legal Addendum (md)</span>
+          <span>DPDP Legal Addendum</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("MIDDLEWARE")}
-          className={`px-3 py-1.5 rounded-lg text-xs transition-colors duration-150 flex items-center gap-1.5 ${
+          className={`px-3.5 py-1.5 rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 ${
             activeTab === "MIDDLEWARE"
-              ? "bg-white/[0.1] text-sky-400 border border-white/[0.15] font-semibold"
-              : "bg-slate-950/60 border border-white/[0.06] text-slate-400 hover:text-slate-200"
+              ? "bg-[#0071e3] text-white font-medium shadow-sm"
+              : "text-[#86868b] hover:text-[#f5f5f7]"
           }`}
         >
           <Terminal className="w-3.5 h-3.5" />
-          <span>Secure Cookie Middleware (ts)</span>
+          <span>Secure Cookie Middleware</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("CONSENT_GATE")}
-          className={`px-3 py-1.5 rounded-lg text-xs transition-colors duration-150 flex items-center gap-1.5 ${
+          className={`px-3.5 py-1.5 rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 ${
             activeTab === "CONSENT_GATE"
-              ? "bg-white/[0.1] text-sky-400 border border-white/[0.15] font-semibold"
-              : "bg-slate-950/60 border border-white/[0.06] text-slate-400 hover:text-slate-200"
+              ? "bg-[#0071e3] text-white font-medium shadow-sm"
+              : "text-[#86868b] hover:text-[#f5f5f7]"
           }`}
         >
           <Code2 className="w-3.5 h-3.5" />
-          <span>Consent Controller (html)</span>
+          <span>Consent Controller</span>
         </button>
       </div>
 
-      {/* Code Viewer Panel (Slop-test Gate 47: No fake traffic-light dots) */}
-      <div className="rounded-xl bg-slate-950 border border-white/[0.08] overflow-hidden font-mono">
-        <div className="flex items-center justify-between px-4 py-2 bg-slate-900/90 border-b border-white/[0.06] text-xs text-slate-400">
-          <span className="text-slate-300 font-medium text-[11px]">
+      {/* Clean Code Viewer Panel (Gate 47: No fake traffic-light dots) */}
+      <div className="rounded-2xl bg-[#000000] border border-white/[0.1] overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-2.5 bg-[#161617] border-b border-white/[0.08] text-xs text-[#86868b]">
+          <span className="text-[#f5f5f7] font-medium text-xs font-mono">
             {activeTab === "LEGAL"
               ? "dpdp-notice-addendum.md"
               : activeTab === "MIDDLEWARE"
               ? "secure-cookies.middleware.ts"
               : "consent-gate.js"}
           </span>
-          <span className="text-[10px] text-slate-500">READY_FOR_PASTE</span>
+          <span className="text-[11px] text-[#86868b] font-mono">READY_FOR_PASTE</span>
         </div>
 
-        <pre className="p-4 sm:p-5 text-xs text-slate-200 overflow-x-auto leading-relaxed max-h-[380px] selection:bg-sky-500/30">
+        <pre className="p-4 sm:p-5 text-xs text-[#d2d2d7] font-mono overflow-x-auto leading-relaxed max-h-[380px] selection:bg-[#0071e3]/30">
           <code>{getActiveContent()}</code>
         </pre>
       </div>

@@ -28,19 +28,19 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
 
   if (!scan) {
     return (
-      <div className="min-h-screen flex flex-col justify-between gloom-canvas">
+      <div className="min-h-screen flex flex-col justify-between apple-canvas">
         <Navbar />
         <main className="max-w-2xl mx-auto px-4 py-24 text-center">
-          <div className="p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-4">
-            <ShieldAlert className="w-12 h-12 text-rose-400 mx-auto" />
-            <h1 className="text-2xl font-bold text-slate-100">Audit Record Not Found</h1>
-            <p className="text-sm text-slate-400">
+          <div className="p-8 sm:p-10 rounded-3xl bg-[#161617]/90 border border-white/[0.1] shadow-2xl space-y-4 backdrop-blur-xl">
+            <ShieldAlert className="w-12 h-12 text-[#ff453a] mx-auto" />
+            <h1 className="text-2xl font-semibold text-[#f5f5f7]">Audit Record Not Found</h1>
+            <p className="text-sm text-[#86868b]">
               The requested scan ID or certificate hash does not exist in local cache or has expired.
             </p>
             <div className="pt-4">
               <Link
                 href="/"
-                className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs inline-flex items-center gap-2 transition-colors duration-150"
+                className="apple-btn-primary inline-flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" /> Return to Scanner
               </Link>
@@ -53,19 +53,19 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between gloom-canvas">
+    <div className="min-h-screen flex flex-col justify-between apple-canvas">
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-12 space-y-6 flex-1 w-full">
         {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
+        <div className="flex items-center justify-between text-xs text-[#86868b]">
           <Link
             href="/"
-            className="hover:text-sky-400 transition-colors flex items-center gap-1.5"
+            className="hover:text-[#2997ff] transition-colors flex items-center gap-1.5"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Scanner
           </Link>
-          <span className="text-slate-500">
+          <span className="text-[#86868b] font-mono">
             Audit ID: {scan.id.slice(0, 18)}...
           </span>
         </div>

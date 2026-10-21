@@ -78,7 +78,7 @@ export default function DriftMonitoringPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between gloom-canvas">
+    <div className="min-h-screen flex flex-col justify-between apple-canvas">
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full space-y-8">
@@ -86,7 +86,7 @@ export default function DriftMonitoringPage() {
         <div>
           <Link
             href="/"
-            className="text-xs text-slate-400 hover:text-sky-400 transition-colors inline-flex items-center gap-1.5 font-mono"
+            className="text-xs text-[#86868b] hover:text-[#2997ff] transition-colors inline-flex items-center gap-1.5"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Return to Scanner
           </Link>
@@ -94,14 +94,14 @@ export default function DriftMonitoringPage() {
 
         {/* Header */}
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/70 border border-indigo-800 text-xs font-mono text-indigo-300">
-            <Activity className="w-3.5 h-3.5 text-indigo-400" />
-            <span>AUTOMATED COMPLIANCE SURVEILLANCE</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.06] border border-white/[0.1] text-xs font-medium text-[#2997ff]">
+            <Activity className="w-3.5 h-3.5" />
+            <span>Automated Compliance Surveillance</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-semibold text-[#f5f5f7] tracking-tight">
             Weekly Compliance Drift Monitor
           </h1>
-          <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
+          <p className="text-sm text-[#86868b] max-w-2xl leading-relaxed font-normal">
             Continuous background surveillance that detects newly injected marketing tags (via GTM),
             insecure session cookies, and statutory DPDP compliance regressions with instant Slack
             alerts.
@@ -109,12 +109,12 @@ export default function DriftMonitoringPage() {
         </div>
 
         {/* Configuration Card */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-xl space-y-6">
-          <form onSubmit={handleRunDriftCheck} className="space-y-4">
+        <div className="p-6 sm:p-8 rounded-3xl bg-[#161617]/90 border border-white/[0.1] shadow-2xl space-y-6 backdrop-blur-xl">
+          <form onSubmit={handleRunDriftCheck} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">
-                  Target Domain / URL:
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-[#f5f5f7]">
+                  Target Domain / URL
                 </label>
                 <input
                   type="text"
@@ -122,14 +122,14 @@ export default function DriftMonitoringPage() {
                   onChange={(e) => setTargetUrl(e.target.value)}
                   placeholder="https://example.com"
                   disabled={loading}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500/80"
+                  className="w-full px-4 py-2.5 rounded-full bg-[#000000]/60 border border-white/[0.1] text-xs text-[#f5f5f7] placeholder-[#86868b] focus:outline-none focus:border-[#0071e3] transition-colors"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <BellRing className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Slack Webhook URL (Optional):</span>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-[#f5f5f7] flex items-center gap-1.5">
+                  <BellRing className="w-3.5 h-3.5 text-[#2997ff]" />
+                  <span>Slack Webhook URL (Optional)</span>
                 </label>
                 <input
                   type="url"
@@ -137,33 +137,35 @@ export default function DriftMonitoringPage() {
                   onChange={(e) => setSlackWebhookUrl(e.target.value)}
                   placeholder="https://hooks.slack.com/services/..."
                   disabled={loading}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500/80"
+                  className="w-full px-4 py-2.5 rounded-full bg-[#000000]/60 border border-white/[0.1] text-xs text-[#f5f5f7] placeholder-[#86868b] focus:outline-none focus:border-[#0071e3] transition-colors"
                 />
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading || !targetUrl.trim()}
-              className="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 active:bg-sky-600 text-slate-950 font-bold text-xs font-mono flex items-center justify-center gap-2 transition-colors duration-150 shadow-md shadow-sky-500/20 disabled:opacity-40"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>{statusMessage || "Running Drift Check..."}</span>
-                </>
-              ) : (
-                <>
-                  <span>Run Live Drift Audit</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
+            <div>
+              <button
+                type="submit"
+                disabled={loading || !targetUrl.trim()}
+                className="apple-btn-primary text-xs flex items-center justify-center gap-2 shadow-lg shadow-[#0071e3]/20 disabled:opacity-40"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>{statusMessage || "Running Drift Check..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Run Live Drift Audit</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </div>
           </form>
 
           {error && (
-            <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-800 text-xs text-rose-300 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+            <div className="p-4 rounded-2xl bg-[#ff453a]/10 border border-[#ff453a]/30 text-xs text-[#ff453a] flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-[#ff453a]" />
               <span>{error}</span>
             </div>
           )}
@@ -171,14 +173,14 @@ export default function DriftMonitoringPage() {
 
         {/* Drift Results Display */}
         {driftResult && (
-          <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+          <div className="p-6 sm:p-8 rounded-3xl bg-[#161617]/90 border border-white/[0.1] shadow-2xl space-y-6 backdrop-blur-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.06] pb-5">
               <div className="flex items-center gap-3">
                 <div
-                  className={`p-3 rounded-2xl ${
+                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
                     driftResult.hasRegression
-                      ? "bg-rose-950 text-rose-400"
-                      : "bg-emerald-950 text-emerald-400"
+                      ? "bg-[#ff453a]/10 text-[#ff453a] border border-[#ff453a]/20"
+                      : "bg-[#34c759]/10 text-[#34c759] border border-[#34c759]/20"
                   }`}
                 >
                   {driftResult.hasRegression ? (
@@ -188,8 +190,8 @@ export default function DriftMonitoringPage() {
                   )}
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-100">{driftResult.domain}</h3>
-                  <p className="text-xs text-slate-400 font-mono">
+                  <h3 className="text-lg font-semibold text-[#f5f5f7]">{driftResult.domain}</h3>
+                  <p className="text-xs text-[#86868b] font-mono">
                     Baseline: {driftResult.gradeChange.previous} → Latest:{" "}
                     {driftResult.gradeChange.current}
                   </p>
@@ -197,44 +199,44 @@ export default function DriftMonitoringPage() {
               </div>
 
               <span
-                className={`px-3 py-1 rounded-full text-xs font-mono font-bold border ${
+                className={`px-3 py-1 rounded-full text-xs font-medium border ${
                   driftResult.hasRegression
-                    ? "bg-rose-950 text-rose-300 border-rose-800"
-                    : "bg-emerald-950 text-emerald-300 border-emerald-800"
+                    ? "bg-[#ff453a]/15 text-[#ff453a] border-[#ff453a]/30"
+                    : "bg-[#34c759]/15 text-[#34c759] border-[#34c759]/30"
                 }`}
               >
                 {driftResult.hasRegression ? "REGRESSION DETECTED" : "COMPLIANT & DRIFT-FREE"}
               </span>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 leading-relaxed">
+            <div className="p-4 rounded-2xl bg-[#000000]/60 border border-white/[0.06] text-xs text-[#d2d2d7] leading-relaxed">
               {driftResult.summary}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
-              <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-                <span className="text-slate-400 block mb-1">New Trackers:</span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div className="p-4 rounded-2xl bg-[#1d1d1f]/60 border border-white/[0.06]">
+                <span className="text-[#86868b] block mb-1">New Trackers</span>
                 <span
-                  className={`text-xl font-bold ${
-                    driftResult.newTrackers.length > 0 ? "text-rose-400" : "text-emerald-400"
+                  className={`text-xl font-semibold ${
+                    driftResult.newTrackers.length > 0 ? "text-[#ff453a]" : "text-[#34c759]"
                   }`}
                 >
                   {driftResult.newTrackers.length}
                 </span>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-                <span className="text-slate-400 block mb-1">New Cookies:</span>
-                <span className="text-xl font-bold text-sky-400">
+              <div className="p-4 rounded-2xl bg-[#1d1d1f]/60 border border-white/[0.06]">
+                <span className="text-[#86868b] block mb-1">New Cookies</span>
+                <span className="text-xl font-semibold text-[#2997ff]">
                   {driftResult.newCookies.length}
                 </span>
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-                <span className="text-slate-400 block mb-1">OWASP Regressions:</span>
+              <div className="p-4 rounded-2xl bg-[#1d1d1f]/60 border border-white/[0.06]">
+                <span className="text-[#86868b] block mb-1">OWASP Regressions</span>
                 <span
-                  className={`text-xl font-bold ${
-                    driftResult.newOwaspIssues.length > 0 ? "text-rose-400" : "text-emerald-400"
+                  className={`text-xl font-semibold ${
+                    driftResult.newOwaspIssues.length > 0 ? "text-[#ff453a]" : "text-[#34c759]"
                   }`}
                 >
                   {driftResult.newOwaspIssues.length}

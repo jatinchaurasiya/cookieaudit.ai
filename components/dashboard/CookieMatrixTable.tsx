@@ -30,27 +30,27 @@ export function CookieMatrixTable({ cookies }: CookieMatrixTableProps) {
   const insecureCount = cookies.filter((c) => c.owaspIssues.length > 0).length;
 
   return (
-    <div className="rounded-2xl bg-slate-900/60 border border-white/[0.08] shadow-xl overflow-hidden backdrop-blur-md">
-      {/* Workbench Header */}
-      <div className="p-5 sm:p-6 border-b border-white/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="rounded-[22px] bg-[#161617]/90 border border-white/[0.08] shadow-2xl overflow-hidden backdrop-blur-xl">
+      {/* Apple-styled Card Header */}
+      <div className="p-6 sm:p-7 border-b border-white/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[11px] text-sky-400 uppercase tracking-wider">
-              OWASP_ASVS // SESSION_SECURITY_MATRIX
+            <span className="text-xs font-mono font-medium text-[#2997ff]">
+              SESSION SECURITY MATRIX
             </span>
-            <span className="px-2 py-0.2 rounded font-mono text-[10px] bg-slate-800 text-slate-300 border border-white/[0.08]">
+            <span className="px-2 py-0.5 rounded-full text-[11px] bg-white/[0.06] text-[#f5f5f7] border border-white/[0.08]">
               {cookies.length} Discovered
             </span>
             {insecureCount > 0 && (
-              <span className="px-2 py-0.2 rounded font-mono text-[10px] bg-rose-950/80 text-rose-300 border border-rose-800/60 font-semibold">
+              <span className="px-2 py-0.5 rounded-full text-[11px] bg-[#ff453a]/15 text-[#ff453a] border border-[#ff453a]/30 font-medium">
                 {insecureCount} Flagged
               </span>
             )}
           </div>
-          <h3 className="text-base font-bold text-slate-100 tracking-tight">
-            Session Cookie Security &amp; Attribute Verification
+          <h3 className="text-xl font-semibold text-[#f5f5f7] tracking-tight">
+            Discovered Cookies &amp; OWASP Attributes
           </h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-[#86868b] font-normal">
             Audited for HttpOnly (XSS), Secure flags (TLS), SameSite (CSRF), and RFC 6265bis 400-day TTL limits.
           </p>
         </div>
@@ -58,33 +58,33 @@ export function CookieMatrixTable({ cookies }: CookieMatrixTableProps) {
         {/* Search & Insecure filter */}
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-[#86868b] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter by name..."
-              className="pl-8 pr-3 py-1.5 rounded-lg bg-slate-950 border border-white/[0.08] text-xs font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500/80 transition-colors duration-150 w-44 sm:w-52"
+              className="pl-9 pr-3.5 py-1.5 rounded-full bg-[#000000]/60 border border-white/[0.14] text-xs text-[#f5f5f7] placeholder-[#86868b] focus:outline-none focus:border-[#0071e3] transition-colors duration-250 w-44 sm:w-52"
             />
           </div>
 
           <button
             type="button"
             onClick={() => setFilterInsecureOnly(!filterInsecureOnly)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono border transition-colors duration-150 flex items-center gap-1.5 ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-normal border transition-colors duration-250 flex items-center gap-1.5 ${
               filterInsecureOnly
-                ? "bg-rose-950/80 border-rose-700 text-rose-300 font-semibold"
-                : "bg-slate-950 border-white/[0.08] text-slate-400 hover:text-slate-200"
+                ? "bg-[#ff453a]/20 border-[#ff453a]/40 text-[#ff453a] font-medium"
+                : "bg-white/[0.06] border-white/[0.1] text-[#86868b] hover:text-[#f5f5f7]"
             }`}
           >
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+            <AlertTriangle className="w-3.5 h-3.5 text-[#ff453a]" />
             <span>Flagged Only</span>
           </button>
         </div>
       </div>
 
-      {/* Segmented Category Filter Strip */}
-      <div className="px-5 py-2.5 bg-slate-950/60 border-b border-white/[0.06] flex flex-wrap items-center gap-1.5">
+      {/* Apple-styled Segmented Filter Pill Strip */}
+      <div className="px-6 py-3 bg-[#000000]/40 border-b border-white/[0.06] flex flex-wrap items-center gap-2">
         {[
           "ALL",
           "Strictly Necessary",
@@ -97,10 +97,10 @@ export function CookieMatrixTable({ cookies }: CookieMatrixTableProps) {
             key={cat}
             type="button"
             onClick={() => setSelectedCategory(cat)}
-            className={`px-2.5 py-1 rounded-md text-[11px] font-mono transition-colors duration-150 ${
+            className={`px-3 py-1 rounded-full text-xs transition-colors duration-250 ${
               selectedCategory === cat
-                ? "bg-white/[0.1] text-white border border-white/[0.2] font-semibold"
-                : "bg-transparent text-slate-400 hover:text-slate-200"
+                ? "bg-[#0071e3] text-white font-medium shadow-md shadow-[#0071e3]/20"
+                : "bg-white/[0.05] text-[#86868b] hover:text-[#f5f5f7] border border-transparent"
             }`}
           >
             {cat}
@@ -111,21 +111,21 @@ export function CookieMatrixTable({ cookies }: CookieMatrixTableProps) {
       {/* Precision Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
-          <thead className="bg-slate-950/90 text-slate-400 font-mono text-[10px] tracking-wider uppercase border-b border-white/[0.06]">
+          <thead className="bg-[#000000]/70 text-[#86868b] text-[11px] font-medium border-b border-white/[0.06]">
             <tr>
-              <th className="py-2.5 px-4 font-semibold">Cookie Identifier</th>
-              <th className="py-2.5 px-4 font-semibold">Category</th>
-              <th className="py-2.5 px-4 font-semibold">Secure</th>
-              <th className="py-2.5 px-4 font-semibold">HttpOnly</th>
-              <th className="py-2.5 px-4 font-semibold">SameSite</th>
-              <th className="py-2.5 px-4 font-semibold">TTL</th>
-              <th className="py-2.5 px-4 font-semibold">Origin</th>
+              <th className="py-3 px-5">Cookie Identifier</th>
+              <th className="py-3 px-5">Category</th>
+              <th className="py-3 px-5">Secure</th>
+              <th className="py-3 px-5">HttpOnly</th>
+              <th className="py-3 px-5">SameSite</th>
+              <th className="py-3 px-5">Lifespan</th>
+              <th className="py-3 px-5">Origin</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.04] font-mono">
+          <tbody className="divide-y divide-white/[0.04]">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-slate-500 text-xs">
+                <td colSpan={7} className="py-10 text-center text-[#86868b] text-xs">
                   No cookies match the selected filter criteria.
                 </td>
               </tr>
@@ -134,25 +134,25 @@ export function CookieMatrixTable({ cookies }: CookieMatrixTableProps) {
                 <tr
                   key={idx}
                   className={`hover:bg-white/[0.02] transition-colors duration-150 ${
-                    cookie.owaspIssues.length > 0 ? "bg-rose-950/[0.08]" : ""
+                    cookie.owaspIssues.length > 0 ? "bg-[#ff453a]/[0.04]" : ""
                   }`}
                 >
-                  {/* Name + Diagnostic issues */}
-                  <td className="py-3 px-4">
-                    <div className="font-semibold text-slate-200">
+                  {/* Name + Issues */}
+                  <td className="py-3.5 px-5">
+                    <div className="font-medium text-[#f5f5f7]">
                       {cookie.name}
                     </div>
                     {cookie.description && (
-                      <div className="text-[11px] text-slate-400 font-sans max-w-xs truncate mt-0.5">
+                      <div className="text-[11px] text-[#86868b] max-w-xs truncate mt-0.5">
                         {cookie.description}
                       </div>
                     )}
                     {cookie.owaspIssues.length > 0 && (
-                      <div className="mt-1 space-y-0.5">
+                      <div className="mt-1 space-y-0.5 font-mono">
                         {cookie.owaspIssues.map((iss, i) => (
                           <div
                             key={i}
-                            className="text-[10px] text-rose-400 flex items-center gap-1"
+                            className="text-[10px] text-[#ff453a] flex items-center gap-1"
                           >
                             <ShieldAlert className="w-3 h-3 shrink-0" />
                             <span>{iss}</span>
@@ -163,16 +163,16 @@ export function CookieMatrixTable({ cookies }: CookieMatrixTableProps) {
                   </td>
 
                   {/* Category */}
-                  <td className="py-3 px-4">
+                  <td className="py-3.5 px-5">
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] ${
+                      className={`px-2 py-0.5 rounded-full text-[10px] ${
                         cookie.category === "Strictly Necessary"
-                          ? "bg-slate-800 text-slate-300"
+                          ? "bg-white/[0.08] text-[#f5f5f7]"
                           : cookie.category === "Marketing"
-                          ? "bg-rose-950 text-rose-300 border border-rose-800/40"
+                          ? "bg-[#ff453a]/15 text-[#ff453a] border border-[#ff453a]/25"
                           : cookie.category === "Analytics"
-                          ? "bg-indigo-950 text-indigo-300 border border-indigo-800/40"
-                          : "bg-slate-800/80 text-slate-400"
+                          ? "bg-[#0071e3]/15 text-[#2997ff] border border-[#0071e3]/25"
+                          : "bg-white/[0.05] text-[#86868b]"
                       }`}
                     >
                       {cookie.category || "Unclassified"}
@@ -180,49 +180,49 @@ export function CookieMatrixTable({ cookies }: CookieMatrixTableProps) {
                   </td>
 
                   {/* Secure */}
-                  <td className="py-3 px-4">
+                  <td className="py-3.5 px-5">
                     {cookie.secure ? (
-                      <span className="text-emerald-400 flex items-center gap-1 text-[11px]">
+                      <span className="text-[#34c759] flex items-center gap-1 font-medium">
                         <ShieldCheck className="w-3.5 h-3.5" /> Yes
                       </span>
                     ) : (
-                      <span className="text-rose-400 flex items-center gap-1 text-[11px] font-bold">
+                      <span className="text-[#ff453a] flex items-center gap-1 font-medium">
                         <ShieldAlert className="w-3.5 h-3.5" /> Insecure
                       </span>
                     )}
                   </td>
 
                   {/* HttpOnly */}
-                  <td className="py-3 px-4">
+                  <td className="py-3.5 px-5">
                     {cookie.httpOnly ? (
-                      <span className="text-emerald-400 flex items-center gap-1 text-[11px]">
+                      <span className="text-[#34c759] flex items-center gap-1 font-medium">
                         <ShieldCheck className="w-3.5 h-3.5" /> Yes
                       </span>
                     ) : (
-                      <span className="text-amber-400 flex items-center gap-1 text-[11px]">
+                      <span className="text-[#ff9f0a] flex items-center gap-1 font-medium">
                         <ShieldAlert className="w-3.5 h-3.5" /> No
                       </span>
                     )}
                   </td>
 
                   {/* SameSite */}
-                  <td className="py-3 px-4 text-slate-300 text-[11px]">
+                  <td className="py-3.5 px-5 font-mono text-xs text-[#d2d2d7]">
                     {cookie.sameSite}
                   </td>
 
                   {/* TTL */}
-                  <td className="py-3 px-4 text-[11px]">
+                  <td className="py-3.5 px-5 font-mono text-xs">
                     {cookie.ttlDays ? (
-                      <span className={cookie.ttlDays > 400 ? "text-rose-400 font-bold" : "text-slate-300"}>
+                      <span className={cookie.ttlDays > 400 ? "text-[#ff453a] font-bold" : "text-[#d2d2d7]"}>
                         {cookie.ttlDays}d
                       </span>
                     ) : (
-                      <span className="text-slate-500">Session</span>
+                      <span className="text-[#86868b]">Session</span>
                     )}
                   </td>
 
                   {/* Origin */}
-                  <td className="py-3 px-4 text-slate-400 text-[10px]">
+                  <td className="py-3.5 px-5 text-[#86868b] text-[11px]">
                     {cookie.source === "HTTP_HEADER" ? "HTTP Header" : "JS Runtime"}
                   </td>
                 </tr>
