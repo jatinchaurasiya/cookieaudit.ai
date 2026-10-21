@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldCheck, Sparkles, Terminal, FileCheck2 } from "lucide-react";
+import { ShieldCheck, Sparkles, Terminal, Activity } from "lucide-react";
+
 
 export function Navbar() {
   return (
@@ -42,7 +43,14 @@ export function Navbar() {
           >
             <ShieldCheck className="w-4 h-4 text-emerald-400" /> Statutory Frameworks
           </Link>
+          <Link
+            href="/drift"
+            className="hover:text-sky-400 transition-colors flex items-center gap-1.5 text-amber-400/90 hover:text-amber-300"
+          >
+            <Activity className="w-4 h-4 text-amber-400" /> Drift Monitor
+          </Link>
         </nav>
+
 
 
         {/* Right Status */}

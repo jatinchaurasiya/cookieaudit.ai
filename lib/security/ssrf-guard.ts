@@ -106,3 +106,19 @@ export async function validateUrlAgainstSsrf(inputUrl: string): Promise<{
     resolvedIp: resolvedIps[0],
   };
 }
+
+/**
+ * Creates a custom DNS lookup callback pinned to the validated IP address,
+ * completely mitigating Time-Of-Check to Time-Of-Use (TOCTOU) DNS Rebinding attacks.
+ */
+export function createPinnedLookup(resolvedIp: string) {
+  const family = resolvedIp.includes(":") ? 6 : 4;
+  return (
+    _hostname: string,
+    _options: any,
+    callback: (err: Error | null, address: string, family: number) => void
+  ) => {
+    callback(null, resolvedIp, family);
+  };
+}
+
