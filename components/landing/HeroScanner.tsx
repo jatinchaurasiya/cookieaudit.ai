@@ -3,23 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Search,
   ShieldAlert,
   Sparkles,
   ArrowRight,
   Loader2,
-  CheckCircle2,
-  Lock,
   Globe2,
 } from "lucide-react";
 
 const SCAN_STEPS = [
-  "SSRF Guard: Resolving DNS & Verifying IP Boundaries...",
-  "Tier 1: Probing HTTP Set-Cookie & TLS 1.3 Security...",
-  "Tier 2: Crawl4AI CDP Engine Extracting Privacy Policy...",
-  "OpenCookieDB: Matching 2,500+ Tracking Signatures...",
-  "OWASP ASVS: Auditing HttpOnly, Secure & SameSite...",
-  "MiniMax M3.1 Flash: Evaluating DPDP Act & GDPR Mandates...",
+  "Validating Host Security & Boundary Isolation...",
+  "Inspecting TLS Transport & Security Headers...",
+  "Analyzing Cookie Attributes & OWASP Session Integrity...",
+  "Cross-Referencing Tracking Signatures & Beacons...",
+  "Evaluating DPDP Act 2023 & GDPR Statutory Mandates...",
   "Generating Cryptographic SHA-256 Non-Repudiation Seal...",
 ];
 
@@ -70,7 +66,6 @@ export function HeroScanner() {
   };
 
   return (
-
     <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden">
       {/* Background glow effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-sky-500/10 blur-[130px] rounded-full pointer-events-none" />
@@ -80,22 +75,22 @@ export function HeroScanner() {
         {/* Top Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs font-medium text-slate-300 mb-6 shadow-inner">
           <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-          <span>India DPDP Act 2023 / 2025 Rules + EU GDPR Article 13 + OWASP ASVS</span>
+          <span>Continuous Privacy Governance • DPDP Act 2023 / Rules 2025 • EU GDPR • OWASP ASVS</span>
         </div>
 
         {/* Hero Title */}
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-100 tracking-tight leading-tight">
-          Automated Web Privacy & <br />
+          Automated Web Privacy &amp; <br />
           <span className="bg-gradient-to-r from-sky-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
-            Cookie Security Audit in &lt;15s
+            Cookie Security Intelligence
           </span>
         </h1>
 
         {/* Subtitle */}
         <p className="mt-6 text-base sm:text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
-          Uncover pre-consent marketing trackers, vulnerable session cookies, and DPDP Rule 3
-          statutory non-compliance. Graded from 0 to 100 with copy-paste remediation code powered by{" "}
-          <span className="text-slate-200 font-semibold">MiniMax M3.1 Flash</span>.
+          Audit any web application in seconds. Detect unauthorized marketing trackers, verify OWASP
+          session integrity, and enforce India DPDP Act 2023 &amp; EU GDPR compliance with verifiable
+          remediation code.
         </p>
 
         {/* Scan Input Form */}
@@ -125,11 +120,11 @@ export function HeroScanner() {
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Scanning...</span>
+                    <span>Analyzing...</span>
                   </>
                 ) : (
                   <>
-                    <span>Run Audit</span>
+                    <span>Audit Website</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -170,35 +165,34 @@ export function HeroScanner() {
           )}
         </div>
 
-
         {/* Feature Badges */}
         <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
           <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="text-sky-400 font-mono text-xs mb-1">TIER 1 & 2</div>
-            <div className="text-sm font-semibold text-slate-200">Zero-Crash Hybrid</div>
+            <div className="text-sky-400 font-mono text-xs mb-1">EVIDENCE-BASED</div>
+            <div className="text-sm font-semibold text-slate-200">0-100 Risk Scoring</div>
             <p className="text-xs text-slate-400 mt-1">
-              &lt;150ms HTTP probe + Crawl4AI container CDP sandbox.
+              Objective grading across session security, tracker beacons, and statutory notice.
             </p>
           </div>
           <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
             <div className="text-indigo-400 font-mono text-xs mb-1">DPDP ACT 2023</div>
-            <div className="text-sm font-semibold text-slate-200">Rule 3 Itemized Notice</div>
+            <div className="text-sm font-semibold text-slate-200">Statutory Notice Check</div>
             <p className="text-xs text-slate-400 mt-1">
-              Grievance Officer, Board complaint right, and equal withdrawal.
+              Itemized notice, purpose mapping, grievance officer, and withdrawal parity.
             </p>
           </div>
           <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="text-emerald-400 font-mono text-xs mb-1">OWASP ASVS</div>
+            <div className="text-emerald-400 font-mono text-xs mb-1">OWASP ASVS v4.0</div>
             <div className="text-sm font-semibold text-slate-200">Session Security</div>
             <p className="text-xs text-slate-400 mt-1">
-              HttpOnly XSS defense, HTTPS Secure flags, and SameSite CSRF.
+              HttpOnly XSS protection, HTTPS Secure flags, and SameSite CSRF defense.
             </p>
           </div>
           <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="text-amber-400 font-mono text-xs mb-1">NON-REPUDIATION</div>
+            <div className="text-amber-400 font-mono text-xs mb-1">AUDIT LEDGER</div>
             <div className="text-sm font-semibold text-slate-200">SHA-256 PDF Seal</div>
             <p className="text-xs text-slate-400 mt-1">
-              Cryptographically signed audit PDF ready for enterprise DPOs.
+              Tamper-evident verification certificates for legal, DPO, and SOC2 audits.
             </p>
           </div>
         </div>

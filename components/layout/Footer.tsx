@@ -46,20 +46,20 @@ export function Footer() {
 
           <div>
             <h4 className="font-semibold text-slate-200 text-xs uppercase tracking-wider mb-3">
-              Inspection Stack
+              Enterprise Assurance
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <span>Tier 1: HTTP/TLS Fast Probe</span>
+                <span className="text-slate-300">Continuous Drift Surveillance</span>
               </li>
               <li>
-                <span>Tier 2: Crawl4AI CDP Engine</span>
+                <span className="text-slate-300">Tamper-Evident SHA-256 Ledger</span>
               </li>
               <li>
-                <span>OpenCookieDB (2,500+ Rules)</span>
+                <span className="text-slate-300">Automated Remediation Engine</span>
               </li>
               <li>
-                <span>MiniMax M3.1 Flash (OpenRouter)</span>
+                <span className="text-slate-300">Zero PII &amp; Data Minimization</span>
               </li>
             </ul>
           </div>
@@ -69,10 +69,10 @@ export function Footer() {
           <p>© 2026 CookieAudit AI. Production-Grade Privacy &amp; Security SaaS.</p>
           <div className="flex items-center gap-4">
             <Link href="/#scanner" className="hover:text-sky-400 transition-colors">
-              Live URL Scanner
+              Privacy Scanner
             </Link>
-            <Link href="/#architecture" className="hover:text-sky-400 transition-colors">
-              Two-Tier Architecture
+            <Link href="/drift" className="hover:text-sky-400 transition-colors">
+              Drift Surveillance
             </Link>
           </div>
         </div>

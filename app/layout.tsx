@@ -13,20 +13,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CookieAudit AI — Automated Web Privacy, Cookie Security & DPDP Compliance",
+  title: "CookieAudit AI — Enterprise Web Privacy, Cookie Security & Regulatory Compliance",
   description:
-    "Audit any website URL in <15 seconds for India DPDP Act 2023/2025, EU GDPR, and OWASP Session Security. Grades compliance from 0 to 100 with AI auto-remediation powered by MiniMax M3.1 Flash.",
+    "Enterprise-grade automated web privacy and cookie security audit platform. Grades websites from 0 to 100 across India DPDP Act 2023/2025, EU GDPR, and OWASP Session Security with instant legal and technical remediation.",
   keywords: [
     "Cookie Audit",
     "DPDP Act 2023",
     "DPDP Rules 2025",
     "GDPR Compliance",
     "OWASP Session Management",
-    "Cookie Scanner",
-    "Privacy Policy Audit",
-    "MiniMax AI",
+    "Cookie Compliance Scanner",
+    "Data Protection Officer Software",
+    "Continuous Privacy Governance",
   ],
 };
+
 
 export default function RootLayout({
   children,

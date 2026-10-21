@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ShieldCheck, Sparkles, Terminal, Activity } from "lucide-react";
 
-
 export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
@@ -18,7 +17,7 @@ export function Navbar() {
               CookieAudit <span className="text-sky-400">AI</span>
             </span>
             <span className="text-[10px] text-slate-400 font-mono tracking-wider">
-              DPDP 2025 • GDPR • OWASP
+              Enterprise Privacy &amp; Cookie Security
             </span>
           </div>
         </Link>
@@ -29,35 +28,33 @@ export function Navbar() {
             href="/#scanner"
             className="hover:text-sky-400 transition-colors flex items-center gap-1.5"
           >
-            <Terminal className="w-4 h-4 text-sky-400" /> Scanner
+            <Terminal className="w-4 h-4 text-sky-400" /> Privacy Scanner
           </Link>
           <Link
-            href="/#architecture"
+            href="/#pillars"
             className="hover:text-sky-400 transition-colors flex items-center gap-1.5"
           >
-            <Sparkles className="w-4 h-4 text-indigo-400" /> Two-Tier Engine
+            <Sparkles className="w-4 h-4 text-indigo-400" /> Compliance Pillars
+          </Link>
+          <Link
+            href="/drift"
+            className="hover:text-sky-400 transition-colors flex items-center gap-1.5"
+          >
+            <Activity className="w-4 h-4 text-emerald-400" /> Drift Surveillance
           </Link>
           <Link
             href="/#statutory"
             className="hover:text-sky-400 transition-colors flex items-center gap-1.5"
           >
-            <ShieldCheck className="w-4 h-4 text-emerald-400" /> Statutory Frameworks
-          </Link>
-          <Link
-            href="/drift"
-            className="hover:text-sky-400 transition-colors flex items-center gap-1.5 text-amber-400/90 hover:text-amber-300"
-          >
-            <Activity className="w-4 h-4 text-amber-400" /> Drift Monitor
+            <ShieldCheck className="w-4 h-4 text-sky-400" /> Statutory Standards
           </Link>
         </nav>
 
-
-
         {/* Right Status */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>MiniMax M3.1 Flash</span>
+            <span>Security Grid: Operational</span>
           </div>
         </div>
       </div>

@@ -53,7 +53,7 @@ export function LegalChecklist({ checklist }: LegalChecklistProps) {
               India DPDP Act 2023 &amp; GDPR Statutory Checklist
             </h3>
             <p className="text-xs text-slate-400">
-              Automated legal analysis conducted by MiniMax M3.1 Flash with verbatim policy evidence
+              Automated statutory compliance audit with verbatim policy documentation evidence
             </p>
           </div>
         </div>

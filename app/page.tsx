@@ -14,7 +14,7 @@ export default function HomePage() {
           <HeroScanner />
         </div>
 
-        {/* Two-Tier Engine & 3-Pillar Architecture Section */}
+        {/* Enterprise Compliance Intelligence & 3-Pillar Architecture Section */}
         <FeaturesGrid />
       </main>
 

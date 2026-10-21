@@ -104,7 +104,7 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
         {/* 5. India DPDP Act 2023 & GDPR Statutory Checklist */}
         <LegalChecklist checklist={scan.aiAudit.dpdpAndGdprChecklist} />
 
-        {/* 6. AI Auto-Remediation Drawer (Markdown Clauses + Fix Code) */}
+        {/* 6. Automated Remediation Drawer (Markdown Clauses + Fix Code) */}
         <RemediationDrawer remediation={scan.aiAudit.remediationPackage} />
       </main>
 

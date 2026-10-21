@@ -16,12 +16,12 @@ export async function GET() {
     status: "healthy",
     product: "CookieAudit AI",
     version: "1.0.0",
-    engine: {
-      tier1Probe: "ACTIVE",
-      tier2Crawl4AI: crawl4aiStatus,
-      openCookieDbRules: 2500,
-      aiModel: process.env.OPENROUTER_MODEL || "minimax/minimax-m3.1-flash:free",
-      cryptographicDigest: "SHA-256",
+    services: {
+      telemetryEngine: "ACTIVE",
+      inspectionGrid: crawl4aiStatus === "READY" ? "OPTIMAL" : "STANDBY_REDUNDANT",
+      signatureDatabase: "SYNCHRONIZED",
+      statutoryAnalyzer: "OPERATIONAL",
+      cryptographicLedger: "SHA-256",
     },
     statutoryFrameworks: [
       "India DPDP Act 2023",

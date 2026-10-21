@@ -96,7 +96,7 @@ export default function DriftMonitoringPage() {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/70 border border-indigo-800 text-xs font-mono text-indigo-300">
             <Activity className="w-3.5 h-3.5 text-indigo-400" />
-            <span>P1 SAAS CONTINUOUS GOVERNANCE</span>
+            <span>AUTOMATED COMPLIANCE SURVEILLANCE</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight">
             Weekly Compliance Drift Monitor
