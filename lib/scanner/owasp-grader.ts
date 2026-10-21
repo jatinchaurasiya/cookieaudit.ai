@@ -58,6 +58,15 @@ export function gradeOwaspSessionSecurity(
       );
     }
 
+    // 5. RFC 6265bis Cookie Prefix Rules (__Host- and __Secure-)
+    if (cookie.name.startsWith("__Host-") && !cookie.secure) {
+      issues.push("RFC 6265bis Prefix Violation: __Host- cookie MUST have the Secure attribute.");
+    }
+    if (cookie.name.startsWith("__Secure-") && !cookie.secure) {
+      issues.push("RFC 6265bis Prefix Violation: __Secure- cookie MUST have the Secure attribute.");
+    }
+
+
     return {
       ...cookie,
       owaspIssues: issues,

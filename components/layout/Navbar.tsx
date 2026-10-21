@@ -37,12 +37,13 @@ export function Navbar() {
             <Sparkles className="w-4 h-4 text-indigo-400" /> Two-Tier Engine
           </Link>
           <Link
-            href="/scan/demo-ecommerce-store"
-            className="hover:text-sky-400 transition-colors flex items-center gap-1.5 text-amber-400/90 hover:text-amber-300"
+            href="/#statutory"
+            className="hover:text-sky-400 transition-colors flex items-center gap-1.5"
           >
-            <FileCheck2 className="w-4 h-4 text-amber-400" /> Demo Audit (Grade C)
+            <ShieldCheck className="w-4 h-4 text-emerald-400" /> Statutory Frameworks
           </Link>
         </nav>
+
 
         {/* Right Status */}
         <div className="flex items-center gap-3">

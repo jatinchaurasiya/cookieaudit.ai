@@ -14,11 +14,29 @@ interface AuditorParams {
 }
 
 /**
- * Intelligent deterministic mock generator used when OPENROUTER_API_KEY is not configured.
- * Guarantees zero downtime and complete demonstrations during offline/academic vivas.
+ * Extracts an authentic verbatim sentence from the scraped privacy policy text matching keywords
  */
-function generateDeterministicFallbackAudit(params: AuditorParams): ComplianceAuditOutput {
-  const policyText = params.privacyPolicyMarkdown.toLowerCase();
+function extractRealPolicyQuote(markdown: string, keywords: string[]): string {
+  if (!markdown || markdown.length < 20 || markdown.startsWith("No dedicated") || markdown.startsWith("Privacy Policy page returned")) {
+    return "Not found in policy";
+  }
+
+  const chunks = markdown.split(/[.\n\r]/).map((s) => s.trim()).filter((s) => s.length > 15);
+  for (const chunk of chunks) {
+    const lower = chunk.toLowerCase();
+    if (keywords.some((k) => lower.includes(k))) {
+      return chunk.slice(0, 220);
+    }
+  }
+
+  return markdown.slice(0, 150).trim();
+}
+
+/**
+ * Deterministic compliance analysis engine evaluating actual scraped DOM, cookies, and policy text
+ */
+function evaluateDeterministicPolicyAudit(params: AuditorParams): ComplianceAuditOutput {
+  const policyText = (params.privacyPolicyMarkdown || "").toLowerCase();
   const domain = new URL(params.targetUrl).hostname;
 
   // Check grievance officer
@@ -26,35 +44,40 @@ function generateDeterministicFallbackAudit(params: AuditorParams): ComplianceAu
     policyText.includes("grievance") ||
     policyText.includes("dpo") ||
     policyText.includes("data protection officer") ||
-    policyText.includes("privacy officer");
+    policyText.includes("privacy officer") ||
+    policyText.includes("nodal officer");
 
   // Check consent withdrawal
   const hasWithdrawal =
     policyText.includes("withdraw consent") ||
     policyText.includes("opt-out") ||
     policyText.includes("unsubscribe") ||
-    policyText.includes("revoke consent");
+    policyText.includes("revoke consent") ||
+    policyText.includes("withdraw your consent");
 
   // Check Data Protection Board
   const hasDpb =
     policyText.includes("data protection board") ||
     policyText.includes("supervisory authority") ||
-    policyText.includes("dpbi");
+    policyText.includes("dpbi") ||
+    policyText.includes("data protection authority");
 
   // Check retention schedule
   const hasRetention =
     policyText.includes("retention") ||
     policyText.includes("retain") ||
     policyText.includes("delete after") ||
-    policyText.includes("retention period");
+    policyText.includes("retention period") ||
+    policyText.includes("erasure");
 
-  // Dark pattern detection
-  const hasBanner = params.bannerHtmlSnippet.length > 30;
+  // Real Dark pattern detection from actual banner DOM
+  const hasBanner = params.bannerHtmlSnippet.length > 20;
   const lowerBanner = params.bannerHtmlSnippet.toLowerCase();
   const hasRejectButton =
     lowerBanner.includes("reject") ||
     lowerBanner.includes("decline") ||
-    lowerBanner.includes("deny");
+    lowerBanner.includes("deny") ||
+    lowerBanner.includes("refuse");
 
   const darkPatterns: Array<{
     type: string;
@@ -67,7 +90,7 @@ function generateDeterministicFallbackAudit(params: AuditorParams): ComplianceAu
       type: "MISSING_REJECT_BUTTON",
       severity: "CRITICAL",
       explanation:
-        "The cookie consent banner provides an 'Accept All' action but lacks a 1-click 'Reject All' button of equal visual prominence, violating EU EDPB Guidelines 3/2022 and India DPDP Section 6.",
+        "The cookie consent banner provides an 'Accept' action but lacks an equally prominent 'Reject' button, violating EU EDPB Guidelines 3/2022 and India DPDP Section 6.",
     });
   }
 
@@ -77,51 +100,72 @@ function generateDeterministicFallbackAudit(params: AuditorParams): ComplianceAu
 
   const trackerNames = params.trackers.map((t) => t.domain);
 
+  // Extract authentic verbatim quotes from the scraped policy
+  const collectionQuote = extractRealPolicyQuote(params.privacyPolicyMarkdown, [
+    "collect",
+    "information",
+    "personal data",
+    "identifiers",
+    "cookies",
+  ]);
+
+  const grievanceQuote = extractRealPolicyQuote(params.privacyPolicyMarkdown, [
+    "grievance",
+    "dpo",
+    "officer",
+    "contact",
+  ]);
+
+  const retentionQuote = extractRealPolicyQuote(params.privacyPolicyMarkdown, [
+    "retention",
+    "retain",
+    "period",
+    "store",
+  ]);
+
   return {
     dpdpAndGdprChecklist: {
       itemizedDataCollected: {
-        passed: policyText.length > 200,
-        evidenceQuote:
-          policyText.length > 200
-            ? "We collect information you provide directly to us, including identifiers, device telemetry, and browsing preferences."
-            : "Not found in policy",
+        passed: policyText.length > 200 && collectionQuote !== "Not found in policy",
+        evidenceQuote: collectionQuote,
         finding:
           policyText.length > 200
-            ? "Policy itemizes categories of personal data collected in compliance with DPDP Rule 3."
+            ? "Policy contains disclosures on personal data categories collected."
             : "Policy fails to provide a clear itemized breakdown of collected personal data.",
       },
       specificPurposeMapping: {
-        passed: policyText.includes("purpose") || policyText.includes("how we use"),
+        passed: policyText.includes("purpose") || policyText.includes("how we use") || policyText.includes("use of data"),
         vagueClausesDetected: policyText.includes("enhance user experience")
-          ? ["'to enhance user experience and improve services'"]
+          ? ["'to enhance user experience'"]
           : [],
-        finding:
-          "Audit identified broad purpose statements that require granular DPDP purpose mapping.",
+        finding: policyText.includes("purpose")
+          ? "Purpose disclosures identified in policy documentation."
+          : "Policy lacks explicit, purpose-limited processing boundaries.",
       },
       grievanceOfficerDetails: {
         passed: hasGrievance,
-        contactExtracted: hasGrievance ? "dpo@" + domain : null,
+        contactExtracted: hasGrievance ? grievanceQuote : null,
         finding: hasGrievance
-          ? "Grievance Redressal Officer / DPO contact mechanism is published."
+          ? `Grievance Redressal Officer / DPO contact mechanism discovered: ${grievanceQuote.slice(0, 100)}`
           : "CRITICAL VIOLATION (DPDP Act 2023 Sec 5): No Grievance Redressal Officer name, designation, or email found.",
       },
       equalEaseConsentWithdrawal: {
         passed: hasWithdrawal,
         finding: hasWithdrawal
-          ? "Notice mentions rights to withdraw consent."
+          ? "Policy mentions explicit mechanisms to withdraw or revoke consent."
           : "VIOLATION (DPDP Act Sec 6(4)): Consent withdrawal mechanism not documented as equal in ease to granting consent.",
       },
       dataProtectionBoardRight: {
         passed: hasDpb,
         finding: hasDpb
           ? "Explicit reference to complaint rights before the Data Protection Board of India / Supervisory Authority."
-          : "VIOLATION (DPDP Rule 3(1)(e)): Fails to inform data principal of their right to make a complaint to the Data Protection Board of India.",
+          : "VIOLATION (DPDP Rule 3(1)(e)): Fails to inform data principal of statutory right to complain to the Data Protection Board of India.",
       },
       dataRetentionSchedule: {
         passed: hasRetention,
-        retentionStated: hasRetention ? "Stated criteria in policy" : null,
+        retentionStated: hasRetention ? retentionQuote : null,
         finding: hasRetention
-          ? "Data retention criteria specified."
+          ? `Data retention criteria documented: ${retentionQuote.slice(0, 80)}`
           : "VIOLATION (DPDP Sec 8(7)): Missing definite data retention timeline or erasure trigger schedule.",
       },
       unconsentedTrackerDisclosure: {
@@ -147,7 +191,7 @@ function generateDeterministicFallbackAudit(params: AuditorParams): ComplianceAu
 We collect: (a) Technical Identifiers (IP address, browser type), (b) Cookies for session management, and (c) Usage metrics.
 
 **2. Purpose Limitation**:
-Data is processed strictly for providing authenticated services, securing transactions, and measuring aggregate traffic with your prior consent.
+Data is processed strictly for providing authenticated services, securing transactions, and measuring aggregate traffic with your prior affirmative consent.
 
 **3. Grievance Redressal Officer (Mandatory under Section 5)**:
 - **Officer**: Data Protection Officer / Grievance Redressal Officer
@@ -226,9 +270,9 @@ export async function runMiniMaxComplianceAudit(
 ): Promise<ComplianceAuditOutput> {
   const apiKey = process.env.OPENROUTER_API_KEY;
 
-  // Fallback to intelligent deterministic auditor if no API key is provided
+  // Utilize deterministic compliance evaluator when API key is not configured
   if (!apiKey || apiKey.trim() === "" || apiKey.includes("xxxxxxxx")) {
-    return generateDeterministicFallbackAudit(params);
+    return evaluateDeterministicPolicyAudit(params);
   }
 
   try {
@@ -303,8 +347,8 @@ Return ONLY a valid JSON object matching the requested schema. Quote verbatim fr
     clearTimeout(timeout);
 
     if (!response.ok) {
-      console.warn(`OpenRouter API returned ${response.status}, utilizing deterministic fallback.`);
-      return generateDeterministicFallbackAudit(params);
+      console.warn(`OpenRouter API returned ${response.status}, utilizing deterministic evaluator.`);
+      return evaluateDeterministicPolicyAudit(params);
     }
 
     const data = await response.json();
@@ -316,7 +360,7 @@ Return ONLY a valid JSON object matching the requested schema. Quote verbatim fr
 
     return ComplianceAuditOutputSchema.parse(JSON.parse(cleanedJson));
   } catch (err: any) {
-    console.warn("OpenRouter API error/timeout, utilizing deterministic fallback:", err.message);
-    return generateDeterministicFallbackAudit(params);
+    console.warn("OpenRouter API error/timeout, utilizing deterministic evaluator:", err.message);
+    return evaluateDeterministicPolicyAudit(params);
   }
 }

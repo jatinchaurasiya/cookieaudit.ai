@@ -94,6 +94,16 @@ export interface ScanScores {
   pillarLegalScore: number;      // 0 - 30 pts
 }
 
+export interface SecurityHeadersFinding {
+  contentSecurityPolicy: string | null;
+  strictTransportSecurity: string | null;
+  xFrameOptions: string | null;
+  xContentTypeOptions: string | null;
+  referrerPolicy: string | null;
+  permissionsPolicy: string | null;
+  headerIssues: string[];
+}
+
 export interface ScanTelemetry {
   targetUrl: string;
   domain: string;
@@ -103,10 +113,12 @@ export interface ScanTelemetry {
   httpStatus: number;
   cookies: RawCookieFinding[];
   trackers: TrackerFinding[];
+  securityHeaders?: SecurityHeadersFinding;
   privacyUrl: string | null;
   privacyPolicyMarkdown: string;
   bannerHtmlSnippet: string;
 }
+
 
 export interface CompleteAuditResult {
   id: string;

@@ -3,98 +3,272 @@
     {
       "pattern": "^_ga(_.*)?$",
       "category": "Analytics",
-      "platform": "Google Analytics",
-      "description": "Used to distinguish unique users and calculate visitor, session and campaign data."
+      "platform": "Google Analytics 4 / Universal",
+      "description": "Calculates visitor, session and campaign data for site analytics."
     },
     {
       "pattern": "^_gid$",
       "category": "Analytics",
       "platform": "Google Analytics",
-      "description": "Stores and updates a unique value for each page visited to generate statistical data."
+      "description": "Stores unique session value to generate statistical reports."
     },
     {
       "pattern": "^_gat(_.*)?$",
       "category": "Analytics",
       "platform": "Google Analytics",
-      "description": "Used by Google Analytics to throttle request rate."
+      "description": "Throttles request rate to limit the collection of data on high traffic sites."
     },
     {
       "pattern": "^_fbp$",
       "category": "Marketing",
-      "platform": "Meta Pixel",
-      "description": "Used by Meta/Facebook to deliver advertisement products such as real-time bidding."
+      "platform": "Meta / Facebook Pixel",
+      "description": "Stores and tracks visits across websites for targeted advertising products."
+    },
+    {
+      "pattern": "^_fbc$",
+      "category": "Marketing",
+      "platform": "Meta / Facebook Pixel",
+      "description": "Stores last click ID when a user arrives from a Facebook advertisement."
     },
     {
       "pattern": "^(fr|sb|datr|wd|c_user)$",
       "category": "Marketing",
-      "platform": "Meta/Facebook",
-      "description": "Contains encrypted Facebook ID and browser identifier for cross-site behavioral retargeting."
+      "platform": "Meta / Facebook",
+      "description": "Encrypted browser and Facebook user identifier for behavioral retargeting."
     },
     {
-      "pattern": "^IDE$",
+      "pattern": "^(IDE|DSID|FLC|RUL)$",
       "category": "Marketing",
       "platform": "Google DoubleClick",
-      "description": "Used by Google DoubleClick to register and report user actions after viewing or clicking ads."
+      "description": "Registers and reports user actions after viewing or clicking Google banner ads."
     },
     {
       "pattern": "^test_cookie$",
       "category": "Marketing",
       "platform": "Google DoubleClick",
-      "description": "Used to check if the user's browser supports cookies."
+      "description": "Tests if the user browser accepts cookies for advertising."
     },
     {
       "pattern": "^_cl(ck|sk)$",
       "category": "Analytics",
       "platform": "Microsoft Clarity",
-      "description": "Stores and combines pageviews by a user into a single session recording."
+      "description": "Captures session heatmaps and recording data for UX analysis."
     },
     {
-      "pattern": "^_hj(id|IncludedInPageviewSample|SessionUser_.*)$",
+      "pattern": "^_hj(id|IncludedInPageviewSample|SessionUser_.*|Session_.*)$",
       "category": "Analytics",
       "platform": "Hotjar",
-      "description": "Hotjar cookie that is set when the customer first lands on a page with the Hotjar script."
+      "description": "Tracks user navigation paths and funnel drop-offs on Hotjar heatmaps."
     },
     {
-      "pattern": "^(PHPSESSID|JSESSIONID|connect\\.sid|__Host-.*|next-auth\\.session-token|session_id|sid|session)$",
+      "pattern": "^(MUID|MC0|MR|MSPC)$",
+      "category": "Marketing",
+      "platform": "Microsoft Bing Ads",
+      "description": "Globally unique user ID across Microsoft properties for retargeting."
+    },
+    {
+      "pattern": "^_tt(p|_enable_cookie)$",
+      "category": "Marketing",
+      "platform": "TikTok Pixel",
+      "description": "Measures TikTok ad campaign performance and custom audience matching."
+    },
+    {
+      "pattern": "^(bcookie|li_sugr|lidc|bscookie|UserMatchHistory)$",
+      "category": "Marketing",
+      "platform": "LinkedIn Insight Tag",
+      "description": "Tracks conversions and unlocks demographic insights for B2B LinkedIn ads."
+    },
+    {
+      "pattern": "^(muc_ads|personalization_id|guest_id.*)$",
+      "category": "Marketing",
+      "platform": "Twitter / X Ads",
+      "description": "Twitter conversion tracking and tailored advertising cookie."
+    },
+    {
+      "pattern": "^_pin_(un)?auth$",
+      "category": "Marketing",
+      "platform": "Pinterest Tag",
+      "description": "Used by Pinterest to track user actions across sites to target Pins."
+    },
+    {
+      "pattern": "^cto_(bundle|bidid|dna_bundle)$",
+      "category": "Marketing",
+      "platform": "Criteo",
+      "description": "Provides behavioral retargeting and personalized product recommendations."
+    },
+    {
+      "pattern": "^(t_gid|taboola_usg)$",
+      "category": "Marketing",
+      "platform": "Taboola",
+      "description": "Tracks clicks and views on sponsored content widgets."
+    },
+    {
+      "pattern": "^obuid$",
+      "category": "Marketing",
+      "platform": "Outbrain",
+      "description": "Outbrain content recommendation and interest tracking cookie."
+    },
+    {
+      "pattern": "^(hubspotutk|__hstc|__hssc|__hssrc)$",
+      "category": "Marketing",
+      "platform": "HubSpot",
+      "description": "Tracks visitor identity and pageviews for HubSpot inbound CRM marketing."
+    },
+    {
+      "pattern": "^(pardot|_pardot_visitor)$",
+      "category": "Marketing",
+      "platform": "Salesforce Pardot",
+      "description": "Identifies web prospects and tracks interactions for B2B CRM sales pipelines."
+    },
+    {
+      "pattern": "^_mkto_trk$",
+      "category": "Marketing",
+      "platform": "Adobe Marketo",
+      "description": "Associates web visits with Marketo email and CRM campaign records."
+    },
+    {
+      "pattern": "^(fs_uid|fs_intercom.*)$",
+      "category": "Analytics",
+      "platform": "FullStory",
+      "description": "FullStory session replay and user frustration metric tracker."
+    },
+    {
+      "pattern": "^lr_(.*)$",
+      "category": "Analytics",
+      "platform": "LogRocket",
+      "description": "Session reproduction and frontend crash monitoring cookie."
+    },
+    {
+      "pattern": "^ajs_(user_id|anonymous_id)$",
+      "category": "Analytics",
+      "platform": "Twilio Segment",
+      "description": "Segment customer data platform identity tracking cookie."
+    },
+    {
+      "pattern": "^mp_.*_mixpanel$",
+      "category": "Analytics",
+      "platform": "Mixpanel",
+      "description": "Mixpanel product analytics and event telemetry cookie."
+    },
+    {
+      "pattern": "^amplitude_id_.*$",
+      "category": "Analytics",
+      "platform": "Amplitude",
+      "description": "Tracks individual user actions and funnel progression."
+    },
+    {
+      "pattern": "^ph_.*_posthog$",
+      "category": "Analytics",
+      "platform": "PostHog",
+      "description": "PostHog product telemetry, feature flags and session recordings."
+    },
+    {
+      "pattern": "^_pk_(id|ses|ref).*$",
+      "category": "Analytics",
+      "platform": "Matomo / Piwik",
+      "description": "Open-source web analytics cookie for privacy-first tracking."
+    },
+    {
+      "pattern": "^(s_cc|s_sq|AMCV_.*|AMCVS_.*)$",
+      "category": "Analytics",
+      "platform": "Adobe Experience Cloud",
+      "description": "Adobe Experience Platform identity service and visitor analytics."
+    },
+    {
+      "pattern": "^(OptanonConsent|OptanonAlertBoxClosed)$",
       "category": "Strictly Necessary",
-      "platform": "Web Application Framework",
-      "description": "Essential server session identifier required to maintain authenticated state."
+      "platform": "OneTrust CMP",
+      "description": "Remembers user consent preferences across categories in OneTrust."
+    },
+    {
+      "pattern": "^CookieConsent$",
+      "category": "Strictly Necessary",
+      "platform": "Cookiebot CMP",
+      "description": "Stores user consent state for the current domain in Cookiebot."
+    },
+    {
+      "pattern": "^(cookieyes-consent|cookieyes_necessary)$",
+      "category": "Strictly Necessary",
+      "platform": "CookieYes CMP",
+      "description": "CookieYes consent manager preference storage."
+    },
+    {
+      "pattern": "^(euconsent-v2|cconsent|gdpr_consent)$",
+      "category": "Strictly Necessary",
+      "platform": "IAB TCF 2.2 Framework",
+      "description": "IAB Transparency & Consent Framework standardized consent string."
+    },
+    {
+      "pattern": "^(PHPSESSID|JSESSIONID|connect\\.sid|ASPSESSIONID.*|ASP\\.NET_SessionId)$",
+      "category": "Strictly Necessary",
+      "platform": "Core Application Server",
+      "description": "Essential HTTP session token required to maintain user state."
+    },
+    {
+      "pattern": "^(laravel_session|remember_web_.*)$",
+      "category": "Strictly Necessary",
+      "platform": "Laravel Framework",
+      "description": "Encrypted session token and authentication state in Laravel."
+    },
+    {
+      "pattern": "^django_session$",
+      "category": "Strictly Necessary",
+      "platform": "Django Framework",
+      "description": "Django session identifier stored in server session backend."
     },
     {
       "pattern": "^(csrftoken|XSRF-TOKEN|_csrf)$",
       "category": "Strictly Necessary",
-      "platform": "Security Framework",
-      "description": "Prevents Cross-Site Request Forgery (CSRF) attacks."
+      "platform": "CSRF Protection",
+      "description": "Protects forms against Cross-Site Request Forgery attacks."
     },
     {
       "pattern": "^(__cf_bm|cf_clearance|__cfruid)$",
       "category": "Strictly Necessary",
-      "platform": "Cloudflare Bot Management",
-      "description": "Cloudflare security cookies to manage incoming malicious bot traffic."
+      "platform": "Cloudflare Security",
+      "description": "Bot management and challenge bypass verification cookie."
     },
     {
-      "pattern": "^(cookie_consent|CookieConsent|optin|gdpr_consent|cookie-compliance)$",
+      "pattern": "^__Host-.*$",
       "category": "Strictly Necessary",
-      "platform": "Consent Management Platform (CMP)",
-      "description": "Stores user consent preferences across browsing sessions."
+      "platform": "Hardened Host Cookie",
+      "description": "OWASP RFC 6265bis prefix: strictly bound to HTTPS host without domain sharing."
     },
     {
-      "pattern": "^(locale|lang|language|theme|dark_mode|currency)$",
+      "pattern": "^__Secure-.*$",
+      "category": "Strictly Necessary",
+      "platform": "Hardened Secure Cookie",
+      "description": "RFC 6265bis prefix: requires Secure flag on HTTPS connections."
+    },
+    {
+      "pattern": "^next-auth\\.session-token.*$",
+      "category": "Strictly Necessary",
+      "platform": "NextAuth.js / Auth.js",
+      "description": "Encrypted session token for Next.js authenticated users."
+    },
+    {
+      "pattern": "^sb-.*-(access-token|refresh-token)$",
+      "category": "Strictly Necessary",
+      "platform": "Supabase Auth",
+      "description": "Supabase PostgreSQL authenticated JWT token."
+    },
+    {
+      "pattern": "^(AWSALB|AWSALBCORS)$",
+      "category": "Strictly Necessary",
+      "platform": "AWS Application Load Balancer",
+      "description": "Maintains sticky sessions routing requests to the same target server."
+    },
+    {
+      "pattern": "^(stripe_mid|stripe_sid|__stripe_orig_props)$",
+      "category": "Strictly Necessary",
+      "platform": "Stripe Payments",
+      "description": "Fraud detection and secure payment processing token."
+    },
+    {
+      "pattern": "^(locale|lang|language|theme|dark_mode|currency|timezone)$",
       "category": "Functional",
       "platform": "User Preferences",
-      "description": "Remembers user display, language, or currency preferences."
-    },
-    {
-      "pattern": "^(MUID|MC0|MR)$",
-      "category": "Marketing",
-      "platform": "Microsoft Advertising",
-      "description": "Used widely by Microsoft as a unique user ID to track visitors across domains."
-    },
-    {
-      "pattern": "^(hubspotutk|__hstc|__hssc)$",
-      "category": "Marketing",
-      "platform": "HubSpot",
-      "description": "Keeps track of visitor identity and behavioral interactions for CRM retargeting."
+      "description": "Remembers language, theme or regional display preferences."
     }
   ]
 }

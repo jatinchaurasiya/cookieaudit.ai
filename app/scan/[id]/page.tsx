@@ -9,7 +9,9 @@ import { CookieMatrixTable } from "@/components/dashboard/CookieMatrixTable";
 import { TrackerRadar } from "@/components/dashboard/TrackerRadar";
 import { LegalChecklist } from "@/components/dashboard/LegalChecklist";
 import { RemediationDrawer } from "@/components/dashboard/RemediationDrawer";
+import { SecurityHeadersCard } from "@/components/dashboard/SecurityHeadersCard";
 import { ArrowLeft, ShieldAlert } from "lucide-react";
+
 
 interface ScanPageProps {
 
@@ -85,8 +87,16 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
         {/* 3. Discovered Cookies & OWASP Session Security Matrix */}
         <CookieMatrixTable cookies={scan.telemetry.cookies} />
 
-        {/* 4. Pre-Consent Trackers & Banner Dark Pattern Analysis */}
+        {/* 4. Web Security & Infrastructure Headers */}
+        <SecurityHeadersCard
+          headers={scan.telemetry.securityHeaders}
+          tlsVersion={scan.telemetry.tlsVersion}
+          hasHsts={scan.telemetry.hasHsts}
+        />
+
+        {/* 5. Pre-Consent Trackers & Banner Dark Pattern Analysis */}
         <TrackerRadar
+
           trackers={scan.telemetry.trackers}
           bannerAnalysis={scan.aiAudit.bannerAnalysis}
         />

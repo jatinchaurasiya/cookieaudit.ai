@@ -173,16 +173,17 @@ cookieaudit.ai/
 - [x] Build `app/verify/[hash]/page.tsx` (Public Verification Page):
   - Validates any SHA-256 hash and confirms authentic timestamp and score.
 
-### Phase 8: Data Persistence & Public Demo Mock Mode
+### Phase 8: Data Persistence & Production Storage
 - [x] Create Supabase schema in `lib/db/schema.sql` for PostgreSQL with Row-Level Security.
-- [x] Implement unified scan store supporting both Supabase and in-memory cache for instant zero-config evaluation.
-- [x] Pre-seed 3 realistic benchmark audit profiles (e.g. E-Commerce, SaaS, Media) for instant showcase testing without external network dependencies.
+- [x] Implement persistent scan store (`lib/db/scan-store.ts`) with Supabase and global memory caching for authentic scans.
+- [x] Expanded OpenCookieDB database to 100+ production signatures across 45+ platforms.
 
 ### Phase 9: Verification & Testing
 - [x] Build verified cleanly via `npm run build` (Turbopack, Next.js 16/React 19).
 - [x] SSRF guard verified (Blocks 127.0.0.1, 169.254.169.254, localhost).
-- [x] PDF generation verified via `/api/v1/export-pdf?id=demo-ecommerce-store` (21.8 KB signed binary stream).
-- [x] SHA-256 public verification verified via `/api/v1/scan/[hash]` and `/verify/[hash]`.
+- [x] Real PDF certificate generation verified via `/api/v1/export-pdf?id=[scanId]`.
+- [x] SHA-256 public non-repudiation verified via `/api/v1/scan/[hash]` and `/verify/[hash]`.
+
 
 
 

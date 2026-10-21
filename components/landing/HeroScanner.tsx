@@ -69,11 +69,8 @@ export function HeroScanner() {
     }
   };
 
-  const handleDemoClick = (demoId: string) => {
-    router.push(`/scan/${demoId}`);
-  };
-
   return (
+
     <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden">
       {/* Background glow effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-sky-500/10 blur-[130px] rounded-full pointer-events-none" />
@@ -171,28 +168,8 @@ export function HeroScanner() {
               </p>
             </div>
           )}
-
-          {/* Demo Benchmarks */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400">
-            <span className="text-slate-500">Quick Showcase:</span>
-            <button
-              type="button"
-              onClick={() => handleDemoClick("demo-ecommerce-store")}
-              className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-400 hover:border-amber-500/50 transition-colors flex items-center gap-1.5"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-              E-Commerce Violations (Grade C)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemoClick("demo-saas-enterprise")}
-              className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-emerald-400 hover:border-emerald-500/50 transition-colors flex items-center gap-1.5"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              Enterprise Hardened (Grade A+)
-            </button>
-          </div>
         </div>
+
 
         {/* Feature Badges */}
         <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 text-left">

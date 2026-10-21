@@ -96,8 +96,10 @@ export async function runHybridComplianceScan(targetUrl: string): Promise<ScanTe
     httpStatus: tier1.httpStatus,
     cookies: Array.from(cookiesMap.values()),
     trackers: tier1.trackers,
+    securityHeaders: tier1.securityHeaders,
     privacyUrl: tier1.privacyUrl,
     privacyPolicyMarkdown: privacyMarkdown,
     bannerHtmlSnippet: bannerSnippet,
   };
 }
+

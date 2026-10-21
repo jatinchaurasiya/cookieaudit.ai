@@ -68,14 +68,15 @@ export function Footer() {
         <div className="border-t border-slate-800/60 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© 2026 CookieAudit AI. Production-Grade Privacy &amp; Security SaaS.</p>
           <div className="flex items-center gap-4">
-            <Link href="/scan/demo-ecommerce-store" className="hover:text-sky-400 transition-colors">
-              E-Commerce Benchmark
+            <Link href="/#scanner" className="hover:text-sky-400 transition-colors">
+              Live URL Scanner
             </Link>
-            <Link href="/scan/demo-saas-enterprise" className="hover:text-sky-400 transition-colors">
-              SaaS Benchmark
+            <Link href="/#architecture" className="hover:text-sky-400 transition-colors">
+              Two-Tier Architecture
             </Link>
           </div>
         </div>
+
       </div>
     </footer>
   );

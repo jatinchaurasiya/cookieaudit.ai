@@ -1,6 +1,6 @@
 import setCookieParser from "set-cookie-parser";
 import * as cheerio from "cheerio";
-import { RawCookieFinding, TrackerFinding } from "@/lib/types/audit";
+import { RawCookieFinding, TrackerFinding, SecurityHeadersFinding } from "@/lib/types/audit";
 
 export const KNOWN_TRACKER_SIGNATURES: Array<{
   pattern: RegExp;
@@ -17,13 +17,23 @@ export const KNOWN_TRACKER_SIGNATURES: Array<{
   { pattern: /analytics\.tiktok\.com/i, domain: "analytics.tiktok.com", category: "Marketing" },
   { pattern: /snap\.licdn\.com/i, domain: "snap.licdn.com", category: "Marketing" },
   { pattern: /criteo\.net/i, domain: "criteo.net", category: "Marketing" },
+  { pattern: /taboola\.com/i, domain: "taboola.com", category: "Marketing" },
+  { pattern: /outbrain\.com/i, domain: "outbrain.com", category: "Marketing" },
+  { pattern: /pinterest\.com\/ct/i, domain: "pinterest.com", category: "Marketing" },
+  { pattern: /js\.hs-scripts\.com|js\.hs-analytics\.net/i, domain: "hubspot.com", category: "Marketing" },
+  { pattern: /munchkin\.marketo\.net/i, domain: "marketo.com", category: "Marketing" },
+  { pattern: /fullstory\.com/i, domain: "fullstory.com", category: "Session Replay" },
+  { pattern: /logrocket\.io/i, domain: "logrocket.com", category: "Session Replay" },
   { pattern: /segment\.(io|com)/i, domain: "segment.com", category: "Tag Manager" },
   { pattern: /mixpanel\.com/i, domain: "mixpanel.com", category: "Analytics" },
+  { pattern: /amplitude\.com/i, domain: "amplitude.com", category: "Analytics" },
+  { pattern: /posthog\.com/i, domain: "posthog.com", category: "Analytics" },
 ];
 
 export interface Tier1ProbeResult {
   cookies: RawCookieFinding[];
   trackers: TrackerFinding[];
+  securityHeaders: SecurityHeadersFinding;
   privacyUrl: string | null;
   bannerHtmlSnippet: string;
   hasHsts: boolean;
@@ -31,6 +41,7 @@ export interface Tier1ProbeResult {
   httpStatus: number;
   initialHtml: string;
 }
+
 
 /**
  * Tier 1: Instant HTTP & TLS Probe (<150ms)
@@ -160,9 +171,42 @@ export async function runTier1FastProbe(targetUrl: string): Promise<Tier1ProbeRe
     bannerHtmlSnippet = $.html(bannerCandidates.first()).slice(0, 5000);
   }
 
+  // 5. Audit Web Security & Infrastructure Headers
+  const cspHeader = response.headers.get("content-security-policy");
+  const hstsHeader = response.headers.get("strict-transport-security");
+  const xfoHeader = response.headers.get("x-frame-options");
+  const xctoHeader = response.headers.get("x-content-type-options");
+  const refHeader = response.headers.get("referrer-policy");
+  const permHeader = response.headers.get("permissions-policy");
+
+  const headerIssues: string[] = [];
+  if (!cspHeader) {
+    headerIssues.push("Missing Content-Security-Policy: vulnerable to cross-site script injections.");
+  }
+  if (parsedUrl.protocol === "https:" && !hstsHeader) {
+    headerIssues.push("Missing Strict-Transport-Security: site vulnerable to SSL-stripping downgrades.");
+  }
+  if (!xfoHeader && (!cspHeader || !cspHeader.includes("frame-ancestors"))) {
+    headerIssues.push("Missing X-Frame-Options: vulnerable to clickjacking iframe embedding.");
+  }
+  if (!xctoHeader || !xctoHeader.toLowerCase().includes("nosniff")) {
+    headerIssues.push("Missing X-Content-Type-Options: nosniff: MIME-type sniffing enabled.");
+  }
+
+  const securityHeaders: SecurityHeadersFinding = {
+    contentSecurityPolicy: cspHeader,
+    strictTransportSecurity: hstsHeader,
+    xFrameOptions: xfoHeader,
+    xContentTypeOptions: xctoHeader,
+    referrerPolicy: refHeader,
+    permissionsPolicy: permHeader,
+    headerIssues,
+  };
+
   return {
     cookies,
     trackers: Array.from(trackerMap.values()),
+    securityHeaders,
     privacyUrl,
     bannerHtmlSnippet,
     hasHsts,
@@ -171,3 +215,4 @@ export async function runTier1FastProbe(targetUrl: string): Promise<Tier1ProbeRe
     initialHtml: html,
   };
 }
+
