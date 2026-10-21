@@ -5,7 +5,7 @@ import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col justify-between cyber-bg">
+    <div className="min-h-screen flex flex-col justify-between gloom-canvas">
       <Navbar />
 
       <main className="flex-1 w-full">

@@ -4,18 +4,21 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ShieldAlert,
-  Sparkles,
   ArrowRight,
   Loader2,
-  Globe2,
+  Globe,
+  Terminal,
+  Lock,
+  Scale,
+  FileCheck2,
 } from "lucide-react";
 
 const SCAN_STEPS = [
-  "Validating Host Security & Boundary Isolation...",
+  "Resolving DNS & Enforcing Pinned Socket Isolation...",
   "Inspecting TLS Transport & Security Headers...",
-  "Analyzing Cookie Attributes & OWASP Session Integrity...",
-  "Cross-Referencing Tracking Signatures & Beacons...",
-  "Evaluating DPDP Act 2023 & GDPR Statutory Mandates...",
+  "Auditing Cookie Attributes against OWASP ASVS v4.0...",
+  "Cross-Referencing Tracking Signatures & Pre-Consent Beacons...",
+  "Evaluating DPDP Act 2023 & GDPR Statutory Disclosures...",
   "Generating Cryptographic SHA-256 Non-Repudiation Seal...",
 ];
 
@@ -34,7 +37,6 @@ export function HeroScanner() {
     setLoading(true);
     setCurrentStep(0);
 
-    // Progress animation stepper
     const interval = setInterval(() => {
       setCurrentStep((prev) => {
         if (prev < SCAN_STEPS.length - 1) return prev + 1;
@@ -66,134 +68,142 @@ export function HeroScanner() {
   };
 
   return (
-    <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-sky-500/10 blur-[130px] rounded-full pointer-events-none" />
-      <div className="absolute top-1/3 right-1/4 w-[400px] h-[300px] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
+    <section className="relative pt-12 pb-16 md:pt-16 md:pb-24">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {/* Asymmetric Header Layout (Slop-test Gate 6: Break centered-everything) */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10 pb-8 border-b border-white/[0.06]">
+          <div className="space-y-3 max-w-2xl">
+            {/* Technical Eyebrow (No emojis - Slop-test Gate 30) */}
+            <div className="inline-flex items-center gap-2 font-mono text-[11px] text-sky-400 tracking-wider uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+              <span>STATUTORY AUDIT APPARATUS // DPDP 2023 · GDPR · OWASP ASVS</span>
+            </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        {/* Top Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs font-medium text-slate-300 mb-6 shadow-inner">
-          <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-          <span>Continuous Privacy Governance • DPDP Act 2023 / Rules 2025 • EU GDPR • OWASP ASVS</span>
+            {/* Display Headline: Solid Roman Type, NO gradient text (Slop-test Gate 2 & Gate 38a) */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-100 tracking-tight leading-[1.12] overflow-wrap-anywhere">
+              Web Privacy &amp; Cookie Security Intelligence
+            </h1>
+
+            {/* Honest measure-limited lede (Slop-test Gate 25) */}
+            <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-[62ch]">
+              Audit any production website against India DPDP Act 2023, EU GDPR, and OWASP Session Security.
+              Inspect pre-consent ad trackers, insecure session cookies, and statutory notice deficits with cryptographic SHA-256 evidence.
+            </p>
+          </div>
+
+          {/* Right Architecture Metric Bar */}
+          <div className="hidden sm:flex flex-col items-start lg:items-end gap-1 font-mono text-[11px] text-slate-400 shrink-0">
+            <span className="text-slate-500">AUDIT SLA</span>
+            <span className="text-slate-200 font-bold">&lt; 15 Seconds</span>
+            <span className="text-emerald-400 flex items-center gap-1 mt-1">
+              <Lock className="w-3 h-3" /> SHA-256 Ledger
+            </span>
+          </div>
         </div>
 
-        {/* Hero Title */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-100 tracking-tight leading-tight">
-          Automated Web Privacy &amp; <br />
-          <span className="bg-gradient-to-r from-sky-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
-            Cookie Security Intelligence
-          </span>
-        </h1>
-
-        {/* Subtitle */}
-        <p className="mt-6 text-base sm:text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
-          Audit any web application in seconds. Detect unauthorized marketing trackers, verify OWASP
-          session integrity, and enforce India DPDP Act 2023 &amp; EU GDPR compliance with verifiable
-          remediation code.
-        </p>
-
-        {/* Scan Input Form */}
-        <div className="mt-10 max-w-2xl mx-auto">
-          <form
-            onSubmit={handleScan}
-            className="p-2 sm:p-2.5 rounded-2xl bg-slate-900/90 border border-slate-800 focus-within:border-sky-500/80 focus-within:ring-4 focus-within:ring-sky-500/10 shadow-2xl transition-all"
-          >
-            <div className="flex flex-col sm:flex-row items-center gap-2">
-              <div className="flex items-center w-full px-3 gap-2.5 text-slate-400">
-                <Globe2 className="w-5 h-5 text-sky-400 shrink-0" />
-                <input
-                  type="text"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Enter website URL (e.g., https://example.com)"
-                  disabled={loading}
-                  className="w-full bg-transparent text-slate-100 placeholder-slate-500 text-sm focus:outline-none py-2"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading || !url.trim()}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-sky-500/25 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Analyzing...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Audit Website</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
+        {/* 05 Workbench Console (Interactive Scan Interface) */}
+        <div className="rounded-2xl bg-slate-900/60 border border-white/[0.08] shadow-2xl overflow-hidden backdrop-blur-md">
+          {/* Console Header Bar */}
+          <div className="px-4 py-2.5 bg-slate-950/80 border-b border-white/[0.06] flex items-center justify-between text-xs font-mono text-slate-400">
+            <div className="flex items-center gap-2">
+              <Terminal className="w-3.5 h-3.5 text-sky-400" />
+              <span className="text-slate-300 font-semibold text-[11px]">TARGET_INSPECTOR // INPUT</span>
             </div>
-          </form>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mt-4 p-3.5 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-center gap-2.5 text-left">
-              <ShieldAlert className="w-4 h-4 shrink-0 text-rose-400" />
-              <span>{error}</span>
+            <div className="flex items-center gap-3 text-[10px] text-slate-500">
+              <span className="hidden sm:inline">PROBE: HTTPS_DEFAULT</span>
+              <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/[0.05]">
+                ENTER ↵
+              </span>
             </div>
-          )}
+          </div>
 
-          {/* Stepper progress when loading */}
-          {loading && (
-            <div className="mt-6 p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-left space-y-2.5 shadow-xl">
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span className="font-mono text-sky-400">AUDIT PIPELINE ACTIVE</span>
-                <span>
-                  Step {currentStep + 1} of {SCAN_STEPS.length}
-                </span>
+          {/* Console Body Form */}
+          <div className="p-4 sm:p-6 space-y-4">
+            <form onSubmit={handleScan} className="space-y-3">
+              <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
+                <div className="flex-1 flex items-center px-3.5 py-3 rounded-xl bg-slate-950 border border-white/[0.08] focus-within:border-sky-500/80 text-slate-300 gap-3 transition-colors duration-150">
+                  <Globe className="w-4 h-4 text-slate-500 shrink-0" />
+                  <input
+                    type="text"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="Enter website URL (e.g., https://stripe.com or example.com)"
+                    disabled={loading}
+                    className="w-full bg-transparent text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-mono focus:outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || !url.trim()}
+                  className="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 active:bg-sky-600 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors duration-150 shadow-md shadow-sky-500/20 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                      <span>Auditing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Run Compliance Audit</span>
+                      <ArrowRight className="w-4 h-4 text-slate-950" />
+                    </>
+                  )}
+                </button>
               </div>
-              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-sky-500 to-indigo-500 transition-all duration-500"
-                  style={{
-                    width: `${((currentStep + 1) / SCAN_STEPS.length) * 100}%`,
-                  }}
-                />
+            </form>
+
+            {/* Error Message */}
+            {error && (
+              <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center gap-2 font-mono">
+                <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+                <span>{error}</span>
               </div>
-              <p className="text-xs text-slate-200 font-mono flex items-center gap-2">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-400" />
-                {SCAN_STEPS[currentStep]}
-              </p>
+            )}
+
+            {/* Stepper Progress */}
+            {loading && (
+              <div className="p-4 rounded-xl bg-slate-950/80 border border-white/[0.06] space-y-3 font-mono text-xs">
+                <div className="flex items-center justify-between text-slate-400 text-[11px]">
+                  <span className="text-sky-400 font-bold">PIPELINE EXECUTION IN PROGRESS</span>
+                  <span>
+                    STAGE {currentStep + 1} / {SCAN_STEPS.length}
+                  </span>
+                </div>
+                <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-sky-400 transition-[width] duration-300 ease-out"
+                    style={{
+                      width: `${((currentStep + 1) / SCAN_STEPS.length) * 100}%`,
+                    }}
+                  />
+                </div>
+                <div className="text-slate-300 text-xs flex items-center gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-400" />
+                  <span>{SCAN_STEPS[currentStep]}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Console Footer / Telemetry Badges */}
+          <div className="px-4 py-3 bg-slate-950/60 border-t border-white/[0.06] grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
+            <div className="flex items-center gap-2 text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+              <span>OWASP ASVS v4.0</span>
             </div>
-          )}
-        </div>
-
-        {/* Feature Badges */}
-        <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="text-sky-400 font-mono text-xs mb-1">EVIDENCE-BASED</div>
-            <div className="text-sm font-semibold text-slate-200">0-100 Risk Scoring</div>
-            <p className="text-xs text-slate-400 mt-1">
-              Objective grading across session security, tracker beacons, and statutory notice.
-            </p>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="text-indigo-400 font-mono text-xs mb-1">DPDP ACT 2023</div>
-            <div className="text-sm font-semibold text-slate-200">Statutory Notice Check</div>
-            <p className="text-xs text-slate-400 mt-1">
-              Itemized notice, purpose mapping, grievance officer, and withdrawal parity.
-            </p>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="text-emerald-400 font-mono text-xs mb-1">OWASP ASVS v4.0</div>
-            <div className="text-sm font-semibold text-slate-200">Session Security</div>
-            <p className="text-xs text-slate-400 mt-1">
-              HttpOnly XSS protection, HTTPS Secure flags, and SameSite CSRF defense.
-            </p>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="text-amber-400 font-mono text-xs mb-1">AUDIT LEDGER</div>
-            <div className="text-sm font-semibold text-slate-200">SHA-256 PDF Seal</div>
-            <p className="text-xs text-slate-400 mt-1">
-              Tamper-evident verification certificates for legal, DPO, and SOC2 audits.
-            </p>
+            <div className="flex items-center gap-2 text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+              <span>DPDP Act 2023 Sec 5/6/8</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>EDPB 3/2022 Dark Patterns</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+              <span>SHA-256 Non-Repudiation</span>
+            </div>
           </div>
         </div>
       </div>

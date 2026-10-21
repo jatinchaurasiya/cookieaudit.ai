@@ -28,7 +28,7 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
 
   if (!scan) {
     return (
-      <div className="min-h-screen flex flex-col justify-between cyber-bg">
+      <div className="min-h-screen flex flex-col justify-between gloom-canvas">
         <Navbar />
         <main className="max-w-2xl mx-auto px-4 py-24 text-center">
           <div className="p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-4">
@@ -40,7 +40,7 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
             <div className="pt-4">
               <Link
                 href="/"
-                className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs inline-flex items-center gap-2 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs inline-flex items-center gap-2 transition-colors duration-150"
               >
                 <ArrowLeft className="w-4 h-4" /> Return to Scanner
               </Link>
@@ -53,10 +53,10 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between cyber-bg">
+    <div className="min-h-screen flex flex-col justify-between gloom-canvas">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8 flex-1 w-full">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-12 space-y-6 flex-1 w-full">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
           <Link

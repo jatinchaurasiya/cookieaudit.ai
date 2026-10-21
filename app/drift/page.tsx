@@ -78,7 +78,7 @@ export default function DriftMonitoringPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between cyber-bg">
+    <div className="min-h-screen flex flex-col justify-between gloom-canvas">
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full space-y-8">
@@ -145,7 +145,7 @@ export default function DriftMonitoringPage() {
             <button
               type="submit"
               disabled={loading || !targetUrl.trim()}
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-sky-500/20 disabled:opacity-50"
+              className="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 active:bg-sky-600 text-slate-950 font-bold text-xs font-mono flex items-center justify-center gap-2 transition-colors duration-150 shadow-md shadow-sky-500/20 disabled:opacity-40"
             >
               {loading ? (
                 <>

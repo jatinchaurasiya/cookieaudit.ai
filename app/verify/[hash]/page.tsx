@@ -14,7 +14,7 @@ export default async function VerifyCertificatePage({ params }: VerifyPageProps)
   const scan = await getScanByHash(hash);
 
   return (
-    <div className="min-h-screen flex flex-col justify-between cyber-bg">
+    <div className="min-h-screen flex flex-col justify-between gloom-canvas">
       <Navbar />
 
       <main className="max-w-3xl mx-auto px-4 py-16 flex-1 w-full">
@@ -83,7 +83,7 @@ export default async function VerifyCertificatePage({ params }: VerifyPageProps)
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link
                   href={`/scan/${scan.id}`}
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs inline-flex items-center justify-center gap-2 transition-all shadow-md shadow-sky-500/20"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs inline-flex items-center justify-center gap-2 transition-colors duration-150 shadow-md shadow-sky-500/20"
                 >
                   <span>View Full Interactive Dashboard</span>
                   <ExternalLink className="w-3.5 h-3.5" />
