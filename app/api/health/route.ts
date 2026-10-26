@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import { getRateLimiterStatus } from "@/lib/security/rate-limiter";
+import { isSealSecretConfigured } from "@/lib/export/audit-seal";
+import { getSupabaseMode } from "@/lib/db/supabase-client";
+import { getScanCacheStats } from "@/lib/db/scan-store";
 
 
 export async function GET() {
@@ -12,16 +16,36 @@ export async function GET() {
     // Expected when local Docker container is not spun up; fallback active
   }
 
+  const limiter = getRateLimiterStatus();
+
   return NextResponse.json({
     status: "healthy",
     product: "CookieAudit AI",
-    version: "1.0.0",
+    version: "1.1.0",
     services: {
       telemetryEngine: "ACTIVE",
       inspectionGrid: crawl4aiStatus === "READY" ? "OPTIMAL" : "STANDBY_REDUNDANT",
       signatureDatabase: "SYNCHRONIZED",
       statutoryAnalyzer: "OPERATIONAL",
-      cryptographicLedger: "SHA-256",
+    },
+    infrastructure: {
+      rateLimiter: {
+        backend: limiter.configured,
+        redisConfigured: limiter.redisUrlConfigured,
+        note: limiter.configured === "redis"
+          ? "Global counters across instances (graceful per-process fallback during Redis outage)."
+          : "Per-process counters. Configure REDIS_URL for globally consistent quotas.",
+      },
+      auditSeal: {
+        secretConfigured: isSealSecretConfigured(),
+        note: isSealSecretConfigured()
+          ? "HMAC-signed certificates active."
+          : "AUDIT_SEAL_SECRET unset - seals use an ephemeral dev key and are not portable.",
+      },
+      persistence: {
+        supabaseMode: getSupabaseMode(),
+      },
+      scanCache: getScanCacheStats(),
     },
     statutoryFrameworks: [
       "India DPDP Act 2023",

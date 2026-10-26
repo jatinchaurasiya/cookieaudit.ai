@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getScanByHash } from "@/lib/db/scan-store";
+import { verifyAuditSeal } from "@/lib/export/audit-seal";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ShieldCheck, ShieldAlert, ArrowLeft, ExternalLink, Lock } from "lucide-react";
@@ -12,6 +13,7 @@ interface VerifyPageProps {
 export default async function VerifyCertificatePage({ params }: VerifyPageProps) {
   const { hash } = await params;
   const scan = await getScanByHash(hash);
+  const sealResult = scan ? verifyAuditSeal(scan) : null;
 
   return (
     <div className="min-h-screen flex flex-col justify-between apple-canvas">
@@ -28,9 +30,10 @@ export default async function VerifyCertificatePage({ params }: VerifyPageProps)
         </div>
 
         <div className="p-8 sm:p-10 rounded-3xl bg-white border border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.04)] space-y-6">
-          {scan ? (
+          {scan && sealResult && sealResult.verdict === "verified" ? (
             <>
-              {/* Authenticated Verification Success */}
+              {/* Authenticated Verification Success: digest + HMAC recomputed
+                  against the STORED audit payload - not a string lookup. */}
               <div className="text-center space-y-2">
                 <div className="w-14 h-14 rounded-full bg-[#34c759]/10 border border-[#34c759]/20 text-[#34c759] flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-7 h-7" />
@@ -39,7 +42,7 @@ export default async function VerifyCertificatePage({ params }: VerifyPageProps)
                   Cryptographic Certificate Verified
                 </h1>
                 <p className="text-xs text-[#34c759] font-medium tracking-wide">
-                  SHA-256 SIGNATURE MATCHES IMMUTABLE AUDIT LEDGER
+                  DIGEST &amp; HMAC SEAL RECOMPUTED AGAINST STORED AUDIT PAYLOAD
                 </p>
               </div>
 
@@ -77,6 +80,14 @@ export default async function VerifyCertificatePage({ params }: VerifyPageProps)
                   <div className="p-2.5 rounded-xl bg-white font-mono text-[11px] text-[#0066cc] break-all select-all border border-black/[0.08]">
                     {scan.sha256Hash}
                   </div>
+                  {scan.signatureHmac ? (
+                    <span className="text-[#86868b] text-[11px] block pt-1">HMAC Seal (Signature of Record):</span>
+                  ) : null}
+                  {scan.signatureHmac ? (
+                    <div className="p-2.5 rounded-xl bg-white font-mono text-[11px] text-[#86868b] break-all select-all border border-black/[0.08]">
+                      {scan.signatureHmac}
+                    </div>
+                  ) : null}
                 </div>
               </div>
 
@@ -89,6 +100,64 @@ export default async function VerifyCertificatePage({ params }: VerifyPageProps)
                   <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
+            </>
+          ) : scan && sealResult && sealResult.verdict === "legacy" ? (
+            <>
+              {/* Legacy certificate: stored before full-payload sealing existed.
+                  Honest state - cannot recompute, so the certificate is NOT
+                  claimed as content-verified. */}
+              <div className="text-center space-y-2">
+                <div className="w-14 h-14 rounded-full bg-[#ff9500]/10 border border-[#ff9500]/20 text-[#ff9500] flex items-center justify-center mx-auto">
+                  <Lock className="w-7 h-7" />
+                </div>
+                <h1 className="text-2xl font-semibold text-[#1d1d1f] tracking-tight">
+                  Legacy Certificate Acknowledged
+                </h1>
+                <p className="text-xs text-[#ff9500] font-medium tracking-wide">
+                  STORED HASH ONLY - AUDIT PAYLOAD NOT ARCHIVED FOR RECOMPUTATION
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#f5f5f7] border border-black/[0.06] space-y-3 text-xs">
+                <div className="flex items-center justify-between border-b border-black/[0.06] pb-2.5">
+                  <span className="text-[#86868b]">Target Website:</span>
+                  <span className="font-semibold text-[#1d1d1f]">{scan.domain}</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-black/[0.06] pb-2.5">
+                  <span className="text-[#86868b]">Audit Timestamp:</span>
+                  <span className="font-mono text-[#6e6e73]">
+                    {new Date(scan.timestamp).toUTCString()}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-xs text-[#86868b] text-center leading-relaxed">
+                This record predates full-payload sealing. The stored digest is acknowledged, but the
+                underlying audit content could not be re-verified cryptographically. Re-scan the site
+                for a verifiable certificate.
+              </p>
+            </>
+          ) : scan && sealResult && sealResult.verdict === "violation" ? (
+            <>
+              {/* INTEGRITY VIOLATION: payload exists but does not match the stored
+                  digest/signature - the record was tampered with or corrupted. */}
+              <div className="text-center space-y-2">
+                <div className="w-14 h-14 rounded-full bg-[#ff3b30]/10 border border-[#ff3b30]/20 text-[#ff3b30] flex items-center justify-center mx-auto">
+                  <ShieldAlert className="w-7 h-7" />
+                </div>
+                <h1 className="text-2xl font-semibold text-[#1d1d1f] tracking-tight">
+                  Certificate Integrity Violation
+                </h1>
+                <p className="text-xs text-[#ff3b30] font-medium tracking-wide">
+                  STORED PAYLOAD FAILED RECOMPUTED DIGEST/SEAL CHECK
+                </p>
+              </div>
+
+              <p className="text-xs text-[#86868b] text-center leading-relaxed">
+                The stored audit content for <code className="text-[#1d1d1f] bg-black/[0.06] px-1.5 py-0.5 rounded font-mono">{hash}</code> does
+                not match its cryptographic seal. The record has been altered or corrupted and must
+                not be trusted.
+              </p>
             </>
           ) : (
             <>
@@ -107,8 +176,8 @@ export default async function VerifyCertificatePage({ params }: VerifyPageProps)
 
               <p className="text-xs text-[#86868b] text-center leading-relaxed">
                 The cryptographic hash <code className="text-[#1d1d1f] bg-black/[0.06] px-1.5 py-0.5 rounded font-mono">{hash}</code> could not be
-                verified against our active audit records. The report may have been forged, altered,
-                or purged.
+                verified against our active audit records. The report may have been revoked,
+                expired, or never issued.
               </p>
             </>
           )}

@@ -1,6 +1,13 @@
 import cookieDbData from "@/data/open-cookie-database.json";
 import { CookieCategory, RawCookieFinding } from "@/lib/types/audit";
 
+interface CookieSignature {
+  pattern: string;
+  category: CookieCategory;
+  platform: string;
+  description: string;
+}
+
 interface CompiledRule {
   regex: RegExp;
   category: CookieCategory;
@@ -8,7 +15,7 @@ interface CompiledRule {
   description: string;
 }
 
-const compiledRules: CompiledRule[] = (cookieDbData.cookies || []).map((c: any) => ({
+const compiledRules: CompiledRule[] = ((cookieDbData as { cookies?: CookieSignature[] }).cookies || []).map((c) => ({
   regex: new RegExp(c.pattern, "i"),
   category: c.category as CookieCategory,
   platform: c.platform,

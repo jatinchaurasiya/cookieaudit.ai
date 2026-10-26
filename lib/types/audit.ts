@@ -9,6 +9,7 @@ export type CookieCategory =
 
 export interface RawCookieFinding {
   name: string;
+  /** Redacted at the scanner: partial cookie values were leaking 6-char prefixes of possible session tokens into reports, storage, and PDFs. */
   valuePreview: string;
   domain: string;
   secure: boolean;
@@ -20,6 +21,8 @@ export interface RawCookieFinding {
   description?: string;
   owaspIssues: string[];
 }
+
+export const REDACTED_COOKIE_PREVIEW = "(redacted)";
 
 export interface TrackerFinding {
   domain: string;
@@ -109,16 +112,25 @@ export interface ScanTelemetry {
   domain: string;
   scanTimestamp: string;
   tlsVersion: string;
+  /** Actual negotiated TLS protocol of the final hop (e.g. "TLSv1.3"), null when plain HTTP */
+  tlsProtocol?: string | null;
   hasHsts: boolean;
   httpStatus: number;
   cookies: RawCookieFinding[];
   trackers: TrackerFinding[];
   securityHeaders?: SecurityHeadersFinding;
+  /** True when a Consent Management Platform (OneTrust, Cookiebot, Consent Mode v2, ...) was detected gating scripts */
+  consentFrameworkDetected?: boolean;
+  /** Absolute URLs of every redirect hop followed during the probe (repudiation evidence) */
+  redirectHops?: string[];
   privacyUrl: string | null;
   privacyPolicyMarkdown: string;
   bannerHtmlSnippet: string;
 }
 
+
+// Late import cycle avoidance: AuditSealPayload is defined in lib/export/audit-seal
+import type { AuditSealPayload } from "@/lib/export/audit-seal";
 
 export interface CompleteAuditResult {
   id: string;
@@ -130,4 +142,14 @@ export interface CompleteAuditResult {
   aiAudit: ComplianceAuditOutput;
   sha256Hash: string;
   executionTimeMs: number;
+  /** Full canonical seal payload - its digest is sha256Hash. Enables independent re-verification. */
+  auditPayload?: AuditSealPayload;
+  /** HMAC-SHA256(AUDIT_SEAL_SECRET, canonical auditPayload) */
+  signatureHmac?: string;
+  /** True when a legacy row was loaded WITHOUT a stored payload (summary only, no fabricated fields) */
+  partialTelemetry?: boolean;
+  /** Whether the persistence layer confirmed the write (never silently assumed) */
+  persisted?: boolean;
+  /** Result of recomputed integrity verification for records loaded from storage */
+  integrityVerdict?: "verified" | "violation" | "legacy" | null;
 }

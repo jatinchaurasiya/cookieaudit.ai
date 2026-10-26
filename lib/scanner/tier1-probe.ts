@@ -1,6 +1,7 @@
 import setCookieParser from "set-cookie-parser";
 import * as cheerio from "cheerio";
-import { RawCookieFinding, TrackerFinding, SecurityHeadersFinding } from "@/lib/types/audit";
+import { REDACTED_COOKIE_PREVIEW, RawCookieFinding, TrackerFinding, SecurityHeadersFinding } from "@/lib/types/audit";
+import { secureFetch } from "@/lib/security/secure-http";
 
 export const KNOWN_TRACKER_SIGNATURES: Array<{
   pattern: RegExp;
@@ -30,53 +31,80 @@ export const KNOWN_TRACKER_SIGNATURES: Array<{
   { pattern: /posthog\.com/i, domain: "posthog.com", category: "Analytics" },
 ];
 
+/**
+ * Consent Management Platform (CMP) fingerprints. A CMP in the page's markup
+ * is a strong (though not perfect) signal that tracker scripts are gated
+ * behind a consent event - which is exactly what our previous code murdered
+ * by assuming every tracker fired pre-consent. Presence of a CMP flips the
+ * finding to "gating detected" so compliant sites stop being scored as
+ * violators purely on script presence.
+ */
+const CMP_SIGNATURES: RegExp[] = [
+  /onetrust/i,
+  /cookiebot|cookie declaration|cybot/i,
+  /consent-management/i,
+  /complianz/i,
+  /borlabs/i,
+  /tarteaucitron/i,
+  /klaro/i,
+  /cookieyes/i,
+  /termly/i,
+  /osano/i,
+  /didomi/i,
+  /usercentrics/i,
+  /quantiz\.qc_|quanti\.qc_/i,
+  /cookieconsent|cookie-consent/i,
+  /consent mode|default.*consent.*ad_storage|dataLayerPush.*consent/i,
+];
+
 export interface Tier1ProbeResult {
   cookies: RawCookieFinding[];
   trackers: TrackerFinding[];
   securityHeaders: SecurityHeadersFinding;
+  consentFrameworkDetected: boolean;
   privacyUrl: string | null;
   bannerHtmlSnippet: string;
   hasHsts: boolean;
   tlsVersion: string;
+  tlsProtocol: string | null;
+  redirectHops: string[];
   httpStatus: number;
-  initialHtml: string;
+  finalUrl: string;
 }
 
 
 /**
- * Tier 1: Instant HTTP & TLS Probe (<150ms)
- * Zero browser overhead; never crashes even if Chromium/Crawl4AI fails.
+ * Tier 1: Secure HTTP & TLS probe. Bounded wall-clock (<~8s), zero browser
+ * overhead, and every byte arrives through the SSRF-pinned transport.
+ * Never crashes on dead targets - errors bubble as typed SecureHttpError /
+ * SsrfSecurityError for the orchestrator to classify.
  */
 export async function runTier1FastProbe(targetUrl: string): Promise<Tier1ProbeResult> {
   const parsedUrl = new URL(targetUrl);
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-  let response: Response;
-  try {
-    response = await fetch(targetUrl, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 CookieAudit/1.0",
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-      },
-      redirect: "follow",
-      signal: controller.signal,
-    });
-  } finally {
-    clearTimeout(timeoutId);
-  }
+  const response = await secureFetch(targetUrl, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 CookieAudit/1.0",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    timeoutMs: 8000,
+    maxRedirects: 5,
+    maxBodyBytes: 4 * 1024 * 1024,
+  });
 
   const httpStatus = response.status;
-  const hasHsts = Boolean(response.headers.get("strict-transport-security"));
-  const tlsVersion = parsedUrl.protocol === "https:" ? "TLS 1.3 / HTTPS" : "Insecure HTTP";
+  const hasHsts = Boolean(
+    response.headers["strict-transport-security"]
+  );
+  const tlsProtocol = response.tlsProtocol;
+  const tlsVersion =
+    tlsProtocol ?? (parsedUrl.protocol === "https:" ? "HTTPS (TLS handshake verified)" : "Insecure HTTP");
 
-  // 1. Parse Set-Cookie headers
-  const rawSetCookieHeaders = response.headers.getSetCookie?.() || [];
-  const parsedCookies = setCookieParser.parse(rawSetCookieHeaders);
-
+  // 1. Parse Set-Cookie headers (accumulated across every redirect hop)
+  const parsedCookies = setCookieParser.parse(response.setCookies);
   const cookies: RawCookieFinding[] = parsedCookies.map((c) => {
     let ttlDays: number | null = null;
     if (c.expires) {
@@ -87,7 +115,7 @@ export async function runTier1FastProbe(targetUrl: string): Promise<Tier1ProbeRe
 
     return {
       name: c.name,
-      valuePreview: c.value ? `${c.value.slice(0, 6)}...` : "(empty)",
+      valuePreview: REDACTED_COOKIE_PREVIEW,
       domain: c.domain || parsedUrl.hostname,
       secure: Boolean(c.secure),
       httpOnly: Boolean(c.httpOnly),
@@ -98,37 +126,39 @@ export async function runTier1FastProbe(targetUrl: string): Promise<Tier1ProbeRe
     };
   });
 
-  // 2. Parse HTML for static scripts, privacy link, and banner DOM
-  const html = await response.text();
+  // 2. Parse HTML for static scripts, privacy link, banner DOM, and CMP gating
+  const html = response.bodyText;
   const $ = cheerio.load(html);
+
+  const consentFrameworkDetected = CMP_SIGNATURES.some((pattern) => pattern.test(html));
 
   const trackerMap = new Map<string, TrackerFinding>();
 
-  // Check <script src="...">
+  const reportTracker = (domain: string, category: TrackerFinding["category"], scriptUrl?: string) => {
+    trackerMap.set(domain, {
+      domain,
+      category,
+      scriptUrl,
+      // Honest semantics: pre-consent firing is claimed ONLY when no CMP is
+      // present (script loaded with no gating mechanism in the markup).
+      firedBeforeConsent: !consentFrameworkDetected,
+    });
+  };
+
   $("script[src]").each((_, el) => {
     const src = $(el).attr("src") || "";
     for (const tracker of KNOWN_TRACKER_SIGNATURES) {
       if (tracker.pattern.test(src)) {
-        trackerMap.set(tracker.domain, {
-          domain: tracker.domain,
-          category: tracker.category,
-          scriptUrl: src,
-          firedBeforeConsent: true,
-        });
+        reportTracker(tracker.domain, tracker.category, src);
       }
     }
   });
 
-  // Check inline script bodies for tracking tag snippets (gtag, fbq)
   $("script:not([src])").each((_, el) => {
     const inlineContent = $(el).html() || "";
     for (const tracker of KNOWN_TRACKER_SIGNATURES) {
       if (tracker.pattern.test(inlineContent)) {
-        trackerMap.set(tracker.domain, {
-          domain: tracker.domain,
-          category: tracker.category,
-          firedBeforeConsent: true,
-        });
+        reportTracker(tracker.domain, tracker.category);
       }
     }
   });
@@ -155,11 +185,13 @@ export async function runTier1FastProbe(targetUrl: string): Promise<Tier1ProbeRe
     }
   });
 
-  // Fallback common privacy endpoints if not found in <a> tags
   if (!privacyUrl) {
-    const commonPrivacyPaths = ["/privacy", "/privacy-policy", "/legal/privacy"];
-    // Keep first candidate
-    privacyUrl = new URL(commonPrivacyPaths[0], targetUrl).toString();
+    const commonPrivacyPath = "/privacy";
+    try {
+      privacyUrl = new URL(commonPrivacyPath, targetUrl).toString();
+    } catch {
+      privacyUrl = null;
+    }
   }
 
   // 4. Banner DOM discovery heuristic
@@ -171,13 +203,13 @@ export async function runTier1FastProbe(targetUrl: string): Promise<Tier1ProbeRe
     bannerHtmlSnippet = $.html(bannerCandidates.first()).slice(0, 5000);
   }
 
-  // 5. Audit Web Security & Infrastructure Headers
-  const cspHeader = response.headers.get("content-security-policy");
-  const hstsHeader = response.headers.get("strict-transport-security");
-  const xfoHeader = response.headers.get("x-frame-options");
-  const xctoHeader = response.headers.get("x-content-type-options");
-  const refHeader = response.headers.get("referrer-policy");
-  const permHeader = response.headers.get("permissions-policy");
+  // 5. Audit Web Security & Infrastructure Headers (from the final hop)
+  const cspHeader = response.headers["content-security-policy"] ?? null;
+  const hstsHeader = response.headers["strict-transport-security"] ?? null;
+  const xfoHeader = response.headers["x-frame-options"] ?? null;
+  const xctoHeader = response.headers["x-content-type-options"] ?? null;
+  const refHeader = response.headers["referrer-policy"] ?? null;
+  const permHeader = response.headers["permissions-policy"] ?? null;
 
   const headerIssues: string[] = [];
   if (!cspHeader) {
@@ -186,20 +218,25 @@ export async function runTier1FastProbe(targetUrl: string): Promise<Tier1ProbeRe
   if (parsedUrl.protocol === "https:" && !hstsHeader) {
     headerIssues.push("Missing Strict-Transport-Security: site vulnerable to SSL-stripping downgrades.");
   }
-  if (!xfoHeader && (!cspHeader || !cspHeader.includes("frame-ancestors"))) {
+  if (!xfoHeader && (!cspHeader || !cspHeader.toString().includes("frame-ancestors"))) {
     headerIssues.push("Missing X-Frame-Options: vulnerable to clickjacking iframe embedding.");
   }
-  if (!xctoHeader || !xctoHeader.toLowerCase().includes("nosniff")) {
+  if (!xctoHeader || !xctoHeader.toString().toLowerCase().includes("nosniff")) {
     headerIssues.push("Missing X-Content-Type-Options: nosniff: MIME-type sniffing enabled.");
+  }
+  if (response.downgradedProtocol) {
+    headerIssues.push(
+      "HTTPS-to-HTTP redirect downgrade detected mid-navigation: transport security is not enforced end-to-end."
+    );
   }
 
   const securityHeaders: SecurityHeadersFinding = {
-    contentSecurityPolicy: cspHeader,
-    strictTransportSecurity: hstsHeader,
-    xFrameOptions: xfoHeader,
-    xContentTypeOptions: xctoHeader,
-    referrerPolicy: refHeader,
-    permissionsPolicy: permHeader,
+    contentSecurityPolicy: cspHeader && typeof cspHeader === "string" ? cspHeader : null,
+    strictTransportSecurity: hasHsts && hstsHeader && typeof hstsHeader === "string" ? hstsHeader : null,
+    xFrameOptions: xfoHeader && typeof xfoHeader === "string" ? xfoHeader : null,
+    xContentTypeOptions: xctoHeader && typeof xctoHeader === "string" ? xctoHeader : null,
+    referrerPolicy: refHeader && typeof refHeader === "string" ? refHeader : null,
+    permissionsPolicy: permHeader && typeof permHeader === "string" ? permHeader : null,
     headerIssues,
   };
 
@@ -207,12 +244,14 @@ export async function runTier1FastProbe(targetUrl: string): Promise<Tier1ProbeRe
     cookies,
     trackers: Array.from(trackerMap.values()),
     securityHeaders,
+    consentFrameworkDetected,
     privacyUrl,
     bannerHtmlSnippet,
     hasHsts,
     tlsVersion,
+    tlsProtocol,
+    redirectHops: response.redirectHops,
     httpStatus,
-    initialHtml: html,
+    finalUrl: response.finalUrl,
   };
 }
-

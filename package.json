@@ -30,6 +30,7 @@
     "@types/set-cookie-parser": "^2.4.10",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
+    "ioredis": "^5.7.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -70,7 +70,10 @@ export function LegalChecklist({ checklist }: LegalChecklistProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         {items.map((item, idx) => {
           const isPassed = item.check.passed;
-          const evidence = (item.check as any).evidenceQuote;
+          const evidence =
+            "evidenceQuote" in item.check
+              ? String((item.check as { evidenceQuote?: string }).evidenceQuote ?? "")
+              : "";
 
           return (
             <div
@@ -113,7 +116,7 @@ export function LegalChecklist({ checklist }: LegalChecklistProps) {
               {evidence && evidence !== "Not found in policy" && (
                 <div className="p-3 rounded-xl bg-white border border-black/[0.08] text-xs text-[#1d1d1f] flex items-start gap-2 shadow-sm">
                   <Quote className="w-3.5 h-3.5 text-[#0066cc] shrink-0 mt-0.5" />
-                  <span className="italic line-clamp-2">"{evidence}"</span>
+                  <span className="italic line-clamp-2">&ldquo;{evidence}&rdquo;</span>
                 </div>
               )}
             </div>

@@ -59,10 +59,11 @@ export function HeroScanner() {
 
       const result = await res.json();
       router.push(`/scan/${result.id}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       clearInterval(interval);
       setLoading(false);
-      setError(err.message || "Failed to complete compliance scan. Please verify URL.");
+      const msg = err instanceof Error ? err.message : "Failed to complete compliance scan. Please verify URL.";
+      setError(msg);
     }
   };
 

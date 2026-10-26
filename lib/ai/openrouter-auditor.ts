@@ -4,6 +4,7 @@ import {
   RawCookieFinding,
   TrackerFinding,
 } from "@/lib/types/audit";
+import { errorMessage } from "@/lib/api/error-response";
 
 interface AuditorParams {
   targetUrl: string;
@@ -99,6 +100,9 @@ function evaluateDeterministicPolicyAudit(params: AuditorParams): ComplianceAudi
     .map((c) => c.name);
 
   const trackerNames = params.trackers.map((t) => t.domain);
+  const preConsentTrackerNames = params.trackers
+    .filter((t) => t.firedBeforeConsent)
+    .map((t) => t.domain);
 
   // Extract authentic verbatim quotes from the scraped policy
   const collectionQuote = extractRealPolicyQuote(params.privacyPolicyMarkdown, [
@@ -169,14 +173,18 @@ function evaluateDeterministicPolicyAudit(params: AuditorParams): ComplianceAudi
           : "VIOLATION (DPDP Sec 8(7)): Missing definite data retention timeline or erasure trigger schedule.",
       },
       unconsentedTrackerDisclosure: {
-        passed: trackerNames.length === 0,
-        undisclosedTrackers: trackerNames,
+        // Honest semantics: only trackers that are ACTUALLY pre-consent (no
+        // CMP gating detected in the markup) count as a disclosure failure.
+        passed: preConsentTrackerNames.length === 0,
+        undisclosedTrackers: preConsentTrackerNames,
         finding:
-          trackerNames.length > 0
-            ? `Found ${trackerNames.length} third-party tracker(s) (${trackerNames.join(
+          preConsentTrackerNames.length > 0
+            ? `Found ${preConsentTrackerNames.length} third-party tracker(s) (${preConsentTrackerNames.join(
                 ", "
-              )}) initializing prior to affirmative consent.`
-            : "No pre-consent third-party tracking beacons detected.",
+              )}) loading with no consent gating mechanism detected.`
+            : trackerNames.length > 0
+              ? "Trackers present, but a consent management platform was detected gating them; no clear pre-consent violation."
+              : "No pre-consent third-party tracking beacons detected.",
       },
     },
     bannerAnalysis: {
@@ -359,8 +367,8 @@ Return ONLY a valid JSON object matching the requested schema. Quote verbatim fr
       .trim();
 
     return ComplianceAuditOutputSchema.parse(JSON.parse(cleanedJson));
-  } catch (err: any) {
-    console.warn("OpenRouter API error/timeout, utilizing deterministic evaluator:", err.message);
+  } catch (err: unknown) {
+    console.warn("OpenRouter API error/timeout, utilizing deterministic evaluator:", errorMessage(err));
     return evaluateDeterministicPolicyAudit(params);
   }
 }

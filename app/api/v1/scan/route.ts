@@ -2,18 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { validateUrlAgainstSsrf, SsrfSecurityError } from "@/lib/security/ssrf-guard";
 import { checkRateLimit } from "@/lib/security/rate-limiter";
-
+import { resolveClientIdentifier } from "@/lib/security/client-ip";
+import { SCAN_LIMIT_PER_HOUR } from "@/lib/config/limits";
 import { runHybridComplianceScan } from "@/lib/scanner/hybrid-orchestrator";
 import { categorizeDiscoveredCookies } from "@/lib/scanner/cookie-categorizer";
 import { gradeOwaspSessionSecurity } from "@/lib/scanner/owasp-grader";
 import { calculateScanScores } from "@/lib/scanner/scoring-engine";
 import { runMiniMaxComplianceAudit } from "@/lib/ai/openrouter-auditor";
-import { computeAuditSha256 } from "@/lib/export/pdf-certificate";
+import {
+  buildSealPayload,
+  computeAuditSha256,
+  signAuditPayload,
+} from "@/lib/export/audit-seal";
 import { saveScanResult } from "@/lib/db/scan-store";
 import { CompleteAuditResult } from "@/lib/types/audit";
+import {
+  errorMessage,
+  expectedErrorPayload,
+  internalErrorPayload,
+  requestId,
+} from "@/lib/api/error-response";
+
+const ROUTE = "POST /api/v1/scan";
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
+  const reqId = requestId();
 
   try {
     const body = await request.json();
@@ -28,44 +42,72 @@ export async function POST(request: NextRequest) {
       ? rawUrl
       : `https://${rawUrl}`;
 
-    // 1. SSRF Guard: Validate URL & DNS
-    let validated: { validUrl: URL; resolvedIp: string };
+    // 0. Cheap URL shape validation FIRST (JWT-parse-level no-I/O checks)
+    let protocolCheckedUrl: URL;
     try {
-      validated = await validateUrlAgainstSsrf(targetUrl);
-    } catch (err: any) {
-      if (err instanceof SsrfSecurityError) {
-        return NextResponse.json({ error: `SSRF Guard: ${err.message}` }, { status: 403 });
-      }
-      return NextResponse.json({ error: `URL validation error: ${err.message}` }, { status: 400 });
+      protocolCheckedUrl = new URL(targetUrl);
+    } catch {
+      return NextResponse.json({ error: "Invalid URL format." }, { status: 400 });
     }
-
-    // 2. IP Rate Limiting
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    const clientIp = forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1";
-    const rateCheck = await checkRateLimit(clientIp, 10);
-
-    if (!rateCheck.success) {
+    if (
+      protocolCheckedUrl.protocol !== "https:" &&
+      protocolCheckedUrl.protocol !== "http:"
+    ) {
       return NextResponse.json(
-        {
-          error: "Rate limit exceeded. Unauthenticated scans are limited to 10 per hour.",
-          resetSeconds: rateCheck.resetSeconds,
-        },
-        { status: 429 }
+        expectedErrorPayload({ error: "Only http: and https: protocols are supported." }),
+        { status: 400 }
       );
     }
 
-    // 3. Two-Tier Hybrid Inspection Engine
+    // 1. Rate limiting BEFORE any network I/O. The DNS-resolving SSRF check is
+    //    relatively expensive, so unauthenticated callers must not be able to
+    //    spend server DNS/egress budget without first passing a quota.
+    //    The identity is spoof-resistant (see lib/security/client-ip.ts):
+    //    a header-trusting strategy previously allowed unlimited fresh buckets.
+    const clientIdentifier = resolveClientIdentifier(request.headers);
+    const rateCheck = await checkRateLimit("scan", clientIdentifier, SCAN_LIMIT_PER_HOUR);
+
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        expectedErrorPayload({
+          error: "Rate limit exceeded. Unauthenticated scans are limited to "
+            + SCAN_LIMIT_PER_HOUR + " per hour.",
+          resetSeconds: rateCheck.resetSeconds,
+          requestId: reqId,
+        }),
+        { status: 429, headers: { "Retry-After": String(rateCheck.resetSeconds) } }
+      );
+    }
+
+    // 2. SSRF Guard: validate URL & pin DNS resolution
+    let validated: { validUrl: URL; resolvedIp: string };
+    try {
+      validated = await validateUrlAgainstSsrf(targetUrl);
+    } catch (err: unknown) {
+      if (err instanceof SsrfSecurityError) {
+        return NextResponse.json(
+          expectedErrorPayload({ error: `SSRF Guard: ${err.message}`, requestId: reqId }),
+          { status: 403 }
+        );
+      }
+      return NextResponse.json(
+        expectedErrorPayload({ error: `URL validation error: ${errorMessage(err)}`, requestId: reqId }),
+        { status: 400 }
+      );
+    }
+
+    // 3. Two-Tier Hybrid Inspection Engine (secure, SSRF-pinned transport)
     const telemetry = await runHybridComplianceScan(validated.validUrl.toString());
 
     // 4. OpenCookieDB Categorization
     const categorizedCookies = categorizeDiscoveredCookies(telemetry.cookies);
 
     // 5. OWASP ASVS Session Security Grader
-    const isHttps = validated.validUrl.protocol === "https:";
+    const isHttps = telemetry.tlsProtocol !== null && validated.validUrl.protocol === "https:";
     const gradedCookies = gradeOwaspSessionSecurity(categorizedCookies, isHttps);
     telemetry.cookies = gradedCookies;
 
-    // 6. MiniMax M3.1 AI Legal & Dark Pattern Audit
+    // 6. Compliance Audit (OpenRouter via MiniMax / deterministic fallback)
     const aiAudit = await runMiniMaxComplianceAudit({
       targetUrl: telemetry.targetUrl,
       discoveredCookies: gradedCookies,
@@ -77,16 +119,21 @@ export async function POST(request: NextRequest) {
     // 7. Deterministic 3-Pillar Scoring
     const scores = calculateScanScores(gradedCookies, telemetry.trackers, aiAudit);
 
-    // 8. Cryptographic Non-Repudiation Seal (SHA-256)
-    const insecureCookieCount = gradedCookies.filter((c) => c.owaspIssues.length > 0).length;
-    const sha256Hash = computeAuditSha256({
+    // 8. Tamper-evident seal (v2): digest + HMAC over the COMPLETE audit
+    //    payload. Digest alone is recomputable by anyone; the HMAC makes the
+    //    seal non-forgeable without the server secret, and /verify re-runs the
+    //    computation instead of pattern-matching strings.
+    const auditPayload = buildSealPayload({
       targetUrl: telemetry.targetUrl,
+      domain: telemetry.domain,
       timestamp: telemetry.scanTimestamp,
       scores,
-      cookieCount: gradedCookies.length,
-      insecureCookieCount,
-      trackerCount: telemetry.trackers.length,
+      telemetry,
+      aiAudit,
+      consentFrameworkDetected: telemetry.consentFrameworkDetected,
     });
+    const sha256Hash = computeAuditSha256(auditPayload);
+    const signatureHmac = signAuditPayload(auditPayload);
 
     const scanId = crypto.randomUUID();
     const executionTimeMs = Date.now() - startTime;
@@ -101,17 +148,18 @@ export async function POST(request: NextRequest) {
       aiAudit,
       sha256Hash,
       executionTimeMs,
+      auditPayload,
+      signatureHmac,
     };
 
-    // Store for retrieval and PDF export
-    await saveScanResult(completeResult);
+    // 9. Persistence - outcome is checked and surfaced, never silent
+    const saveOutcome = await saveScanResult(completeResult);
+    completeResult.persisted = saveOutcome.persisted;
 
     return NextResponse.json(completeResult);
-  } catch (err: any) {
-    console.error("Scan pipeline execution error:", err);
-    return NextResponse.json(
-      { error: "Internal scan orchestrator error", details: err.message },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    // Target unreachable / timeouts are client-facing conditions, not bugs
+    const internal = internalErrorPayload(ROUTE, err, reqId);
+    return NextResponse.json(internal.body, { status: internal.status });
   }
 }

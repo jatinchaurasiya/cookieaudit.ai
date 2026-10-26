@@ -1,4 +1,3 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getScanById, getScanByHash } from "@/lib/db/scan-store";
 import { Navbar } from "@/components/layout/Navbar";
@@ -76,6 +75,18 @@ export default async function ScanDetailPage({ params }: ScanPageProps) {
           telemetry={scan.telemetry}
           executionTimeMs={scan.executionTimeMs}
         />
+
+        {scan.integrityVerdict === "violation" ? (
+          <div className="p-4 rounded-2xl border border-[#ff3b30]/20 bg-[#ff3b30]/5 text-xs text-[#ff3b30]">
+            Integrity check failed: the stored audit content does not match its cryptographic seal. This record has been altered and must not be trusted.
+          </div>
+        ) : null}
+
+        {scan.partialTelemetry && scan.integrityVerdict !== "violation" ? (
+          <div className="p-4 rounded-2xl border border-[#ff9500]/20 bg-[#ff9500]/5 text-xs text-[#8a6d3b]">
+            Summary record: this audit was stored before full-payload archiving, so cookie-level details are unavailable. Re-scan the site for a complete, integrity-verifiable report.
+          </div>
+        ) : null}
 
         {/* 2. Cryptographic Non-Repudiation Seal & PDF Export Action */}
         <ExportReportBar

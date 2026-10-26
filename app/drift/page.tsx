@@ -7,17 +7,15 @@ import { Footer } from "@/components/layout/Footer";
 import {
   Activity,
   AlertTriangle,
-  CheckCircle2,
   ArrowRight,
-  Radio,
   BellRing,
   Loader2,
   ShieldCheck,
   ShieldAlert,
   ArrowLeft,
-  Sparkles,
 } from "lucide-react";
 import { DriftReport } from "@/lib/drift/drift-detector";
+import { errorMessage } from "@/lib/api/error-response";
 
 export default function DriftMonitoringPage() {
   const [targetUrl, setTargetUrl] = useState("");
@@ -37,7 +35,7 @@ export default function DriftMonitoringPage() {
     setStatusMessage("Executing baseline audit...");
 
     try {
-      // 1. Run baseline scan
+      // 1. Baseline audit (real scan #1)
       const baselineRes = await fetch("/api/v1/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,15 +47,32 @@ export default function DriftMonitoringPage() {
       }
       const baselineScan = await baselineRes.json();
 
-      setStatusMessage("Simulating production release verification & drift comparison...");
+      // 2. SECOND real scan for the comparison. The previous demo compared a
+      //    record with itself and labeled the output a drift check -
+      //    fabricated. Comparing two independent audits (even seconds apart)
+      //    is a genuine point-in-time consistency test.
+      setStatusMessage("Executing second audit for real comparison...");
 
-      // 2. Run drift scan API
+      const currentRes = await fetch("/api/v1/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: targetUrl.trim() }),
+      });
+      if (!currentRes.ok) {
+        const err = await currentRes.json();
+        throw new Error(err.error || "Failed to execute comparison scan");
+      }
+      const currentScan = await currentRes.json();
+
+      setStatusMessage("Comparing audit records for compliance drift...");
+
+      // 3. Drift comparison API
       const driftRes = await fetch("/api/v1/cron/drift-scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           baselineScanId: baselineScan.id,
-          currentScanId: baselineScan.id, // Fresh comparison
+          currentScanId: currentScan.id,
           slackWebhookUrl: slackWebhookUrl.trim() || undefined,
         }),
       });
@@ -70,9 +85,8 @@ export default function DriftMonitoringPage() {
       const driftData = await driftRes.json();
       setDriftResult(driftData.driftReport);
       setStatusMessage("");
-    } catch (err: any) {
-      setError(err.message || "Failed to complete drift check");
-    } finally {
+    } catch (err: unknown) {
+      setError(errorMessage(err) || "Failed to complete drift check");    } finally {
       setLoading(false);
     }
   };

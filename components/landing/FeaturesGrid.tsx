@@ -165,8 +165,8 @@ export function FeaturesGrid() {
           <div className="md:col-span-8 p-8 rounded-3xl bg-white border border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between space-y-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-semibold text-[#0066cc]">NON-REPUDIATION</span>
-                <span className="text-xs font-mono text-[#86868b]">SHA-256</span>
+                <span className="text-xs font-mono font-semibold text-[#0066cc]">TAMPER-EVIDENT SEAL</span>
+              <span className="text-xs font-mono text-[#86868b]">SHA-256 + HMAC</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-tight">
                 Cryptographic Audit Ledger &amp; Remediation Code

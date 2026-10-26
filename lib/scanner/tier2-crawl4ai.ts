@@ -24,7 +24,13 @@ export async function runTier2Crawl4Ai(
 
     const response = await fetch(`${crawl4aiBase}/crawl`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        // Optional shared-secret auth for the self-hosted scraper container
+        ...(process.env.CRAWL4AI_API_TOKEN
+          ? { Authorization: `Bearer ${process.env.CRAWL4AI_API_TOKEN}` }
+          : {}),
+      },
       body: JSON.stringify({
         urls: urlsToCrawl,
         browser_config: {

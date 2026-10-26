@@ -9,7 +9,7 @@ import { CompleteAuditResult } from "@/lib/types/audit";
 export function computeAuditSha256(data: {
   targetUrl: string;
   timestamp: string;
-  scores: any;
+  scores: unknown;
   cookieCount: number;
   insecureCookieCount: number;
   trackerCount: number;
@@ -135,7 +135,7 @@ export function generateAuditPdfCertificate(audit: CompleteAuditResult): Uint8Ar
     margin: { left: 14, right: 14 },
   });
 
-  let currentY = (doc as any).lastAutoTable.finalY + 10;
+  let currentY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
 
   // If table went too far down, add new page
   if (currentY > 230) {
@@ -173,7 +173,7 @@ export function generateAuditPdfCertificate(audit: CompleteAuditResult): Uint8Ar
     margin: { left: 14, right: 14 },
   });
 
-  const footerY = (doc as any).lastAutoTable.finalY + 12;
+  const footerY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 12;
 
   // Cryptographic Audit Seal
   if (footerY > 260) {
@@ -188,13 +188,13 @@ export function generateAuditPdfCertificate(audit: CompleteAuditResult): Uint8Ar
   doc.setTextColor(30, 41, 59);
   doc.setFontSize(8);
   doc.setFont("helvetica", "bold");
-  doc.text("CRYPTOGRAPHIC AUDIT SEAL (SHA-256 NON-REPUDIATION)", 18, sealY + 6);
+  doc.text("TAMPER-EVIDENT AUDIT SEAL (SHA-256 DIGEST + HMAC SIGNATURE)", 18, sealY + 6);
 
   doc.setFont("courier", "normal");
   doc.setFontSize(7);
   doc.setTextColor(71, 85, 105);
   doc.text(`SHA-256: ${audit.sha256Hash}`, 18, sealY + 11);
-  doc.text(`Verify Authenticity at: https://cookieaudit.space/verify/${audit.sha256Hash.slice(0, 16)}`, 18, sealY + 15);
+  doc.text(`Verify Authenticity at: ${new URL(`/verify/${audit.sha256Hash.slice(0, 16)}`, process.env.NEXT_PUBLIC_APP_URL || "https://cookieaudit.space").toString()}`, 18, sealY + 15);
 
   return doc.output("arraybuffer") as unknown as Uint8Array;
 }

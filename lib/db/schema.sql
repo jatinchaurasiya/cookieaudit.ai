@@ -36,6 +36,13 @@ CREATE TABLE IF NOT EXISTS scan_cookies (
   owasp_issues TEXT[] DEFAULT '{}'
 );
 
+-- 3. Tamper-evident seal columns (v2 certificate).
+--    `audit_payload` holds the COMPLETE canonical audit content; sha256_hash
+--    is its digest and signature_hmac is HMAC-SHA256(server secret, payload).
+--    Verification RECOMPUTES both, so DB tampering is detectable.
+ALTER TABLE scans ADD COLUMN IF NOT EXISTS signature_hmac TEXT;
+ALTER TABLE scans ADD COLUMN IF NOT EXISTS audit_payload JSONB;
+
 -- 3. Monitored Domains (Weekly Drift SaaS)
 CREATE TABLE IF NOT EXISTS monitored_domains (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
