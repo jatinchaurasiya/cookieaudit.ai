@@ -18,7 +18,7 @@ const SCAN_STEPS = [
   "Auditing Cookie Attributes against OWASP ASVS v4.0...",
   "Cross-Referencing Tracking Signatures & Pre-Consent Beacons...",
   "Evaluating DPDP Act 2023 & GDPR Statutory Disclosures...",
-  "Generating Cryptographic SHA-256 Non-Repudiation Seal...",
+  "Generating Tamper-Evident SHA-256 + HMAC Audit Seal...",
 ];
 
 export function HeroScanner() {
@@ -54,7 +54,17 @@ export function HeroScanner() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Scan failed with status ${res.status}`);
+        const base = errData.error || `Scan failed with status ${res.status}`;
+        // Surface the honest retry clock on quota errors instead of a dead end
+        const retryMinutes =
+          res.status === 429 && typeof errData.resetSeconds === "number"
+            ? Math.max(1, Math.ceil(errData.resetSeconds / 60))
+            : null;
+        throw new Error(
+          retryMinutes !== null
+            ? `${base} Quota resets in about ${retryMinutes} minute${retryMinutes === 1 ? "" : "s"}.`
+            : base
+        );
       }
 
       const result = await res.json();

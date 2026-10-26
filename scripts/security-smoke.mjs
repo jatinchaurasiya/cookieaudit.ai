@@ -87,25 +87,82 @@ async function postScan(url) {
 
 // ---------------------------------------------------------------- test 4: rate limiting
 {
-  const limitEnv = process.env.SCAN_RATE_LIMIT_PER_HOUR || undefined;
-  const limit = parseInt(limitEnv || "10", 10);
-  // test pages share one spoof-proof bucket for "unknown"-ish local clients;
-  // use a stable test client identity
+  // Default-agnostic: the deployment under test may configure any generous
+  // anonymous quota. We burst until a 429 arrives (bounded by 200 attempts).
+  // NOTE: without SCAN_API_KEYS configured, these requests consume the SAME
+  // fail-closed "unknown" bucket that interactive local browsers use (no
+  // trusted-proxy headers exist locally) - which is exactly why the smoke
+  // suite later verifies key-namespace separation in test 5.
   let saw429 = false;
-  let statusSequence = [];
-  for (let i = 0; i < limit + 3; i++) {
-    const { res } = await postScan("http://127.0.0.1:8773/page");
-    statusSequence.push(res.status);
-    if (res.status === 429) { saw429 = true; break; }
+  let anonLimitMessage = "";
+  let statuses = [];
+  for (let i = 0; i < 200; i++) {
+    const { res, body } = await postScan("http://127.0.0.1:8773/page");
+    statuses.push(res.status);
+    if (res.status === 429) {
+      saw429 = true;
+      anonLimitMessage = body?.error || "";
+      break;
+    }
   }
+  const condensed = statuses.length > 9 ? `${statuses.slice(0, 6).join(",")}...${statuses.slice(-3).join(",")}` : statuses.join(",");
   record(
-    "scan rate limit engages (429) within quota+2",
+    "anonymous quota engages (429) at generous default",
     saw429,
-    `tried=${Math.min(limit + 3, statusSequence.length)} statuses=${statusSequence.join(",")}`
+    `tried=${statuses.length} statuses=${condensed} msg=${anonLimitMessage.slice(0, 80)}`
   );
 }
 
-// ---------------------------------------------------------------- test 5: drift cron auth rejection
+// ---------------------------------------------------------------- test 5: API-key namespace separation
+{
+  const key = process.env.SMOKE_API_KEY || "";
+  if (!key) {
+    record(
+      "api-key namespace separation (skipped: no SMOKE_API_KEY)",
+      true,
+      "start the app with SCAN_API_KEYS + SMOKE_API_KEY to exercise this check"
+    );
+  } else {
+    // After the anonymous bucket is exhausted, key holders must NOT inherit
+    // a 429 - their counter lives in a different namespace with its own quota.
+    let sawOtherThan429 = 0;
+    for (let i = 0; i < 3; i++) {
+      const res = await fetch(`${BASE}/api/v1/scan`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": key,
+          "x-forwarded-for": `10.${Date.now() % 255}.0.1`,
+        },
+        body: JSON.stringify({ url: "http://127.0.0.1:8773/page" }),
+      });
+      if (res.status !== 429) sawOtherThan429++;
+    }
+    record(
+      "api-key requests unaffected by exhausted anonymous bucket",
+      sawOtherThan429 === 3,
+      `non-429 responses=${sawOtherThan429}/3`
+    );
+  }
+}
+
+// ---------------------------------------------------------------- test 6: rate-limit transparency headers
+{
+  // The PDF route validates 'id' after accounting the quota, so this cheap
+  // 400 response must still carry the standard X-RateLimit-* headers (or
+  // none at all when the deployment is uncapped - both are honest postures;
+  // what must NOT happen is a middleware pretending it counted).
+  const res = await fetch(`${BASE}/api/v1/export-pdf`, { method: "GET" });
+  const hasHeaders = res.headers.get("x-ratelimit-limit") !== null;
+  const capped = Number(res.headers.get("x-ratelimit-limit")) > 0;
+  record(
+    "rate-limit transparency headers present",
+    hasHeaders && capped && res.status === 400,
+    `status=${res.status} limit=${res.headers.get("x-ratelimit-limit")} remaining=${res.headers.get("x-ratelimit-remaining")}`
+  );
+}
+
+// ---------------------------------------------------------------- test 7: drift cron auth rejection
 {
   const res = await fetch(`${BASE}/api/v1/cron/drift-scan`, {
     method: "POST",

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { validateUrlAgainstSsrf, SsrfSecurityError } from "@/lib/security/ssrf-guard";
-import { checkRateLimit } from "@/lib/security/rate-limiter";
+import { checkRateLimit, RateLimitResult } from "@/lib/security/rate-limiter";
 import { resolveClientIdentifier } from "@/lib/security/client-ip";
-import { SCAN_LIMIT_PER_HOUR } from "@/lib/config/limits";
+import { resolveApiKeyAuth, bucketIdentity } from "@/lib/security/api-auth";
+import { SCAN_LIMIT_PER_HOUR, SCAN_API_LIMIT_PER_HOUR, isUnlimited } from "@/lib/config/limits";
 import { runHybridComplianceScan } from "@/lib/scanner/hybrid-orchestrator";
 import { categorizeDiscoveredCookies } from "@/lib/scanner/cookie-categorizer";
 import { gradeOwaspSessionSecurity } from "@/lib/scanner/owasp-grader";
@@ -24,6 +25,19 @@ import {
 } from "@/lib/api/error-response";
 
 const ROUTE = "POST /api/v1/scan";
+
+/**
+ * Standard rate-limit transparency headers. Omitted for uncapped scopes -
+ * an "infinite remaining" value is a lie, so it is simply not emitted.
+ */
+function rateLimitHeaders(result: RateLimitResult): Record<string, string> {
+  if (isUnlimited(result.limit) || result.remaining < 0) return {};
+  return {
+    "X-RateLimit-Limit": String(result.limit),
+    "X-RateLimit-Remaining": String(result.remaining),
+    "X-RateLimit-Reset": String(result.resetSeconds),
+  };
+}
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
@@ -62,20 +76,33 @@ export async function POST(request: NextRequest) {
     // 1. Rate limiting BEFORE any network I/O. The DNS-resolving SSRF check is
     //    relatively expensive, so unauthenticated callers must not be able to
     //    spend server DNS/egress budget without first passing a quota.
-    //    The identity is spoof-resistant (see lib/security/client-ip.ts):
-    //    a header-trusting strategy previously allowed unlimited fresh buckets.
+    //    Identity classes are separated: a valid API key (X-API-Key or
+    //    Authorization: Bearer) counts against the key-tier quota in its own
+    //    namespace; anonymous requests count against the anonymous quota.
     const clientIdentifier = resolveClientIdentifier(request.headers);
-    const rateCheck = await checkRateLimit("scan", clientIdentifier, SCAN_LIMIT_PER_HOUR);
+    const apiKeyAuth = resolveApiKeyAuth(request.headers);
+    const scanLimit = apiKeyAuth ? SCAN_API_LIMIT_PER_HOUR : SCAN_LIMIT_PER_HOUR;
+    const rateCheck = await checkRateLimit(
+      "scan",
+      bucketIdentity(apiKeyAuth, clientIdentifier),
+      scanLimit
+    );
 
     if (!rateCheck.success) {
       return NextResponse.json(
         expectedErrorPayload({
-          error: "Rate limit exceeded. Unauthenticated scans are limited to "
-            + SCAN_LIMIT_PER_HOUR + " per hour.",
+          error: apiKeyAuth
+            ? `Scan quota exceeded for API key '${apiKeyAuth.keyId}'. Limited to ${scanLimit} per hour.`
+            : `Rate limit exceeded. Unauthenticated scans are limited to ${SCAN_LIMIT_PER_HOUR} per hour. `
+              + "High-volume callers can use an API key via the X-API-Key header, "
+              + "and deployments can raise SCAN_RATE_LIMIT_PER_HOUR.",
           resetSeconds: rateCheck.resetSeconds,
           requestId: reqId,
         }),
-        { status: 429, headers: { "Retry-After": String(rateCheck.resetSeconds) } }
+        {
+          status: 429,
+          headers: { "Retry-After": String(rateCheck.resetSeconds), ...rateLimitHeaders(rateCheck) },
+        }
       );
     }
 
@@ -87,7 +114,7 @@ export async function POST(request: NextRequest) {
       if (err instanceof SsrfSecurityError) {
         return NextResponse.json(
           expectedErrorPayload({ error: `SSRF Guard: ${err.message}`, requestId: reqId }),
-          { status: 403 }
+          { status: 403, headers: rateLimitHeaders(rateCheck) }
         );
       }
       return NextResponse.json(
@@ -156,7 +183,9 @@ export async function POST(request: NextRequest) {
     const saveOutcome = await saveScanResult(completeResult);
     completeResult.persisted = saveOutcome.persisted;
 
-    return NextResponse.json(completeResult);
+    return NextResponse.json(completeResult, {
+      headers: rateLimitHeaders(rateCheck),
+    });
   } catch (err: unknown) {
     // Target unreachable / timeouts are client-facing conditions, not bugs
     const internal = internalErrorPayload(ROUTE, err, reqId);

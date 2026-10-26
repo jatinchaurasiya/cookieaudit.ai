@@ -1,6 +1,10 @@
 import crypto from "node:crypto";
 import Redis from "ioredis";
-import { RATE_LIMIT_WINDOW_SECONDS, RateLimitScope } from "@/lib/config/limits";
+import {
+  RATE_LIMIT_WINDOW_SECONDS,
+  RateLimitScope,
+  isUnlimited,
+} from "@/lib/config/limits";
 
 export interface RateLimitResult {
   success: boolean;
@@ -162,6 +166,19 @@ export async function checkRateLimit(
   limit: number,
   windowSeconds: number = RATE_LIMIT_WINDOW_SECONDS
 ): Promise<RateLimitResult> {
+  // A scope configured with limit <= 0 is uncapped (e.g. the API-key tier at
+  // 0/unset-below-zero). Nothing can be enforced or counted, so skip store
+  // accounting entirely instead of pretending to count against "infinity".
+  if (isUnlimited(limit)) {
+    return {
+      success: true,
+      limit: 0,
+      remaining: -1, // sentinel: unlimited (no X-RateLimit-* headers emitted)
+      resetSeconds: 0,
+      backend: process.env.REDIS_URL ? "redis" : "memory",
+    };
+  }
+
   const key = bucketKey(scope, identifier);
   const redis = getRedis();
 

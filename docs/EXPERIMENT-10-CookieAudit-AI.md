@@ -63,6 +63,8 @@ Unauthenticated abuse of compute/network budgets is countered with fixed-window 
 
 Because the limiter keys on client identity, trusting headers blindly is itself a vulnerability: the previous practice of reading `x-forwarded-for` directly let an attacker mint unlimited "fresh" IP buckets. CookieAudit AI resolves identity according to the deployment's **trust model** (`IP_STRATEGY`: platform-normalized *leftmost*, reverse-proxy *rightmost-trusted* with `TRUSTED_PROXY_COUNT`, or fail-closed `none`), validating that the chosen value is a routable (non-private) IP and otherwise collapsing traffic into one shared bucket.
 
+Separately from abuse resistance, the product distinguishes **identity classes**: anonymous browsers receive a generous interactive quota, and callers presenting a configured API key (`X-API-Key` or `Authorization: Bearer`, compare-validated in constant time) are accounted against their own key-tier namespace with a higher or unlimited quota — so high-volume integrations never compete with anonymous browsers, and scripts never drain buckets shared with humans. Clients see real budget state through the standard `X-RateLimit-Limit` / `X-RateLimit-Remaining` / `X-RateLimit-Reset` response headers (omitted honestly, not fabricated, for uncapped scopes).
+
 ### 4.5 Input Validation
 
 Every boundary validates shape and range before processing: the scan endpoint rejects missing/non-URL values and unexpected protocols; the PDF endpoint requires an `id`; the drift endpoint requires two scan identifiers and, additionally, refuses self-comparison requests that would produce fabricated "drift"; Slack webhook URLs are validated structurally (scheme, host `hooks.slack.com`, path prefix `/services/`). Zod schemas validate the structured output returned by the external LLM before it can reach reports or storage. The OpenCookieDB matcher compiles stored regexes once at startup and applies them only to the cookie **name** (never to values).
@@ -264,7 +266,9 @@ Perform these checks only on the local CookieAudit AI instance and against targe
 | SSRF — private IP | `POST /api/v1/scan` with `{"url":"http://127.0.0.1:6379"}`. | HTTP 403 "SSRF Guard ... loopback ... blocked". |
 | SSRF — cloud metadata | Scan `http://169.254.169.254` or a domain resolving to it. | HTTP 403 "prohibited IP ... metadata blocked". |
 | Redirection bypass | Scan a URL that 302-redirects to an internal address. | The redirect hop is re-validated and rejected (manual chasing). |
-| Rate limiting | Burst the scan endpoint past `SCAN_RATE_LIMIT_PER_HOUR`. | HTTP 429 with `Retry-After`. |
+| Rate limiting | Burst the scan endpoint past `SCAN_RATE_LIMIT_PER_HOUR`. | HTTP 429 with `Retry-After`; success responses carry `X-RateLimit-Limit` / `Remaining` / `Reset`. |
+| Quota transparency | Open DevTools → Network on any scan response. | `X-RateLimit-*` headers show the real budget; uncapped scopes omit them (never fabricate "infinite"). |
+| API-key identity class | With `SCAN_API_KEYS` configured, run scans with `X-API-Key/<key>` after exhausting the anonymous quota. | Key requests are accounted in their own namespace and succeed (or fail only at the SSRF guard), not 429. |
 | Identity spoofing | Repeat the burst with random `x-forwarded-for` values. | Still throttled (buckets are not minted from spoofable headers). |
 | Protected/unknown resources | Open `/scan/00000000-...` or `/verify/deadbeef`. | "Audit Record Not Found"/verification failed state; no data leak. |
 | Drift endpoint security | `POST /api/v1/cron/drift-scan` without the secret in production. | HTTP 503/403; with secret: self-comparison requests rejected as meaningless. |

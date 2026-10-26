@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getRateLimiterStatus } from "@/lib/security/rate-limiter";
+import { apiKeysConfigured } from "@/lib/security/api-auth";
 import { isSealSecretConfigured } from "@/lib/export/audit-seal";
 import { getSupabaseMode } from "@/lib/db/supabase-client";
 import { getScanCacheStats } from "@/lib/db/scan-store";
@@ -32,6 +33,7 @@ export async function GET() {
       rateLimiter: {
         backend: limiter.configured,
         redisConfigured: limiter.redisUrlConfigured,
+        apiKeysConfigured: apiKeysConfigured(),
         note: limiter.configured === "redis"
           ? "Global counters across instances (graceful per-process fallback during Redis outage)."
           : "Per-process counters. Configure REDIS_URL for globally consistent quotas.",
